@@ -5,6 +5,7 @@ export default function PokemonPage() {
     <SearchableList
       title="Pokemon"
       apiUrl="https://pokeapi.co/api/v2/pokemon?limit=1000"
+      hrefPattern="/pokemon/{name}"
     />
   );
 }

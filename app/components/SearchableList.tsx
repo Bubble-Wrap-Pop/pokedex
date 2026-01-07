@@ -1,15 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 interface SearchableListProps {
   title: string;
   apiUrl: string;
+  hrefPattern: string;
 }
 
 export default function SearchableList({
   title,
   apiUrl,
+  hrefPattern,
 }: SearchableListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [items, setItems] = useState<any[]>([]);
@@ -55,16 +58,26 @@ export default function SearchableList({
         <div className="text-center py-12 text-zinc-600 dark:text-zinc-400">Loading...</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filteredItems.map((item) => (
-            <div
-              key={item.name}
-              className="p-4 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 hover:shadow-lg transition-shadow"
-            >
+          {filteredItems.map((item) => {
+            const formattedName = item.name.replace(/-/g, " ");
+            const href = hrefPattern.replace("{name}", item.name)
+            const content = (
               <h3 className="font-semibold text-lg capitalize text-black dark:text-zinc-50">
-                {item.name.replace(/-/g, " ")}
+                {formattedName}
               </h3>
-            </div>
-          ))}
+            );
+
+
+            return (
+              <Link
+                key={item.name}
+                href={href}
+                className="p-4 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 hover:shadow-lg transition-shadow cursor-pointer"
+              >
+                {content}
+              </Link>
+            );
+          })}
         </div>
       )}
 
