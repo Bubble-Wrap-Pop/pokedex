@@ -29,6 +29,8 @@ export default function SearchableList({
 }: SearchableListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(itemsPerPage);
+  const [colorMap, setColorMap] = useState<Record<string, string>>({});
+  const [isLoadingColors, setIsLoadingColors] = useState(false);
 
   // Defer search query for better performance
   const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -60,6 +62,59 @@ export default function SearchableList({
   const totalFiltered = filteredItems.length;
   const displayedEnd = Math.min(visibleCount, totalFiltered);
   const paginatedItems = filteredItems.slice(0, displayedEnd);
+
+  // Batch fetch colors for visible items
+  useEffect(() => {
+    if (!getItemColor || paginatedItems.length === 0) {
+      return;
+    }
+
+    // Only fetch colors for items we don't already have
+    const itemsToFetch = paginatedItems.filter((item) => !colorMap[item.name]);
+    
+    if (itemsToFetch.length === 0) {
+      setIsLoadingColors(false);
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoadingColors(true);
+
+    const fetchColors = async () => {
+      try {
+        // Fetch all colors in parallel
+        const colorPromises = itemsToFetch.map(async (item) => {
+          try {
+            const color = await getItemColor(item.name);
+            return { name: item.name, color };
+          } catch {
+            return { name: item.name, color: "from-gray-400 to-gray-500" };
+          }
+        });
+
+        const results = await Promise.all(colorPromises);
+        
+        if (!cancelled) {
+          const newColorMap: Record<string, string> = {};
+          results.forEach(({ name, color }) => {
+            newColorMap[name] = color;
+          });
+          setColorMap((prev) => ({ ...prev, ...newColorMap }));
+          setIsLoadingColors(false);
+        }
+      } catch {
+        if (!cancelled) {
+          setIsLoadingColors(false);
+        }
+      }
+    };
+
+    fetchColors();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [paginatedItems, getItemColor, colorMap]);
 
   const titleClassName =
     titleSize === "large"
@@ -123,7 +178,8 @@ export default function SearchableList({
                     name={item.name}
                     href={href}
                     formattedName={formattedName}
-                    getItemColor={getItemColor}
+                    colorClass={colorMap[item.name] || "from-gray-400 to-gray-500"}
+                    isLoading={!colorMap[item.name] && isLoadingColors}
                   />
                 );
               }
