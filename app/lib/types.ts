@@ -6,6 +6,14 @@ export interface PokemonData {
       name: string;
     };
   }>;
+  abilities: Array<{
+    ability: {
+      name: string;
+      url: string;
+    };
+    is_hidden: boolean;
+    slot: number;
+  }>;
   stats: Array<{
     base_stat: number;
     stat: { name: string };

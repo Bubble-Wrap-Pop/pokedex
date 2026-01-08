@@ -20,7 +20,7 @@ interface PokemonDetailPageProps {
 export async function generateMetadata({ params }: PokemonDetailPageProps): Promise<Metadata> {
   const { name } = await params;
   const formattedName = formatName(name);
-  return generateDetailMetadata("pokemon", `${formattedName} details, stats, moves, and encounter locations.`, name);
+  return generateDetailMetadata("pokemon", `${formattedName} details, abilities, stats, moves, and encounter locations.`, name);
 }
 
 export default async function PokemonDetailPage({ params }: PokemonDetailPageProps) {
@@ -59,6 +59,42 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
               })
             ) : (
               <p className="text-zinc-600 dark:text-zinc-400">No types available</p>
+            )}
+          </div>
+        </DetailCard>
+
+        {/* Abilities */}
+        <DetailCard title="Abilities" className="mb-8">
+          <div className="space-y-3">
+            {pokemon.abilities && pokemon.abilities.length > 0 ? (
+              pokemon.abilities
+                .sort((a, b) => {
+                  // Sort by slot, then hidden abilities last
+                  if (a.is_hidden !== b.is_hidden) {
+                    return a.is_hidden ? 1 : -1;
+                  }
+                  return a.slot - b.slot;
+                })
+                .map((abilityEntry) => {
+                  const abilityName = formatName(abilityEntry.ability.name);
+                  return (
+                    <div
+                      key={abilityEntry.ability.name}
+                      className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800"
+                    >
+                      <span className="text-lg font-semibold text-black dark:text-zinc-50">
+                        {abilityName}
+                      </span>
+                      {abilityEntry.is_hidden && (
+                        <span className="px-2 py-1 text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded">
+                          Hidden
+                        </span>
+                      )}
+                    </div>
+                  );
+                })
+            ) : (
+              <p className="text-zinc-600 dark:text-zinc-400">No abilities available</p>
             )}
           </div>
         </DetailCard>
