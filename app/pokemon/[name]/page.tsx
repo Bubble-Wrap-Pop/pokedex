@@ -3,7 +3,7 @@ import Image from "next/image";
 import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
 import EmptyStateCard from "../../components/EmptyStateCard";
-import SearchableList from "../../components/SearchableList";
+import LocationList from "../../components/LocationList";
 import MovesList from "../../components/MovesList";
 import { getPokemon, getPokemonLocations } from "../../lib/api";
 import { formatName } from "../../lib/format";
@@ -167,7 +167,7 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
         {/* Locations */}
         <DetailCard className="mb-8">
           {locations.length > 0 ? (
-            <SearchableList
+            <LocationList
               title="Locations"
               items={locations.map((name) => ({ name }))}
               hrefPattern="/locations/{name}"
