@@ -1,5 +1,11 @@
 const POKEAPI_BASE_URL = "https://pokeapi.co/api/v2";
 
+export const API_CONFIG = {
+  BASE_URL: POKEAPI_BASE_URL,
+  CACHE_REVALIDATE: 3600, // 1 hour in seconds
+  DEFAULT_PAGE_SIZE: 1500, // For fetchAllList
+} as const;
+
 export const API_ENDPOINTS = {
   POKEMON: `${POKEAPI_BASE_URL}/pokemon`,
   LOCATION: `${POKEAPI_BASE_URL}/location`,
@@ -7,7 +13,9 @@ export const API_ENDPOINTS = {
   GENERATION: `${POKEAPI_BASE_URL}/generation`,
 } as const;
 
-export const ITEMS_PER_PAGE = 100;
-export const ITEMS_PER_PAGE_DETAIL = 20;
-export const MAX_STAT_VALUE = 255;
-export const SPRITE_SIZE = 160;
+export const UI_CONFIG = {
+  ITEMS_PER_PAGE: 100,
+  ITEMS_PER_PAGE_DETAIL: 20,
+  MAX_STAT_VALUE: 255,
+  SPRITE_SIZE: 160,
+} as const;

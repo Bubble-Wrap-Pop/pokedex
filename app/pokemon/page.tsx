@@ -1,6 +1,12 @@
 import SearchableList from "../components/SearchableList";
 import { getPokemonList } from "../lib/api";
-import { ITEMS_PER_PAGE } from "../lib/constants";
+import { UI_CONFIG } from "../lib/constants";
+import { generateDetailMetadata } from "../lib/metadata";
+
+export const metadata = generateDetailMetadata(
+  "pokemon",
+  "Browse all Pokemon species in the Pokedex."
+);
 
 export default async function PokemonPage() {
   const pokemon = await getPokemonList();
@@ -10,7 +16,7 @@ export default async function PokemonPage() {
       title="Pokemon"
       items={pokemon}
       hrefPattern="/pokemon/{name}"
-      itemsPerPage={ITEMS_PER_PAGE}
+      itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE}
     />
   );
 }

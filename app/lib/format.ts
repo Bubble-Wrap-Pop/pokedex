@@ -1,5 +1,9 @@
 export function formatName(name: string) {
-  return name.replace(/-/g, " ");
+  return name
+    .replace(/-/g, " ")
+    .split(" ")
+    .map((word) => word[0]?.toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 export function formatGenerationName(name: string): string {

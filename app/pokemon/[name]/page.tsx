@@ -2,12 +2,12 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
-import EmptyState from "../../components/EmptyState";
+import EmptyStateCard from "../../components/EmptyStateCard";
 import SearchableList from "../../components/SearchableList";
 import { getPokemon, getPokemonLocations } from "../../lib/api";
-import type { PokemonData } from "../../lib/types";
 import { formatName } from "../../lib/format";
-import { ITEMS_PER_PAGE_DETAIL, MAX_STAT_VALUE, SPRITE_SIZE } from "../../lib/constants";
+import { UI_CONFIG } from "../../lib/constants";
+import { generateDetailMetadata } from "../../lib/metadata";
 import type { Metadata } from "next";
 
 interface PokemonDetailPageProps {
@@ -17,19 +17,17 @@ interface PokemonDetailPageProps {
 export async function generateMetadata({ params }: PokemonDetailPageProps): Promise<Metadata> {
   const { name } = await params;
   const formattedName = formatName(name);
-  return {
-    title: `Pokedex – ${formattedName}`,
-    description: `${formattedName} details, stats, moves, and encounter locations.`,
-  };
+  return generateDetailMetadata("pokemon", `${formattedName} details, stats, moves, and encounter locations.`, name);
 }
 
 export default async function PokemonDetailPage({ params }: PokemonDetailPageProps) {
   const { name: pokemonName } = await params;
 
   try {
+    // Fetch pokemon data, with graceful error handling for locations
     const [pokemon, locations] = await Promise.all([
       getPokemon(pokemonName),
-      getPokemonLocations(pokemonName).catch(() => []),
+      getPokemonLocations(pokemonName).catch(() => [] as string[]),
     ]);
 
     const formattedName = formatName(pokemon.name);
@@ -50,8 +48,8 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
                     <Image
                       src={pokemon.sprites.front_default}
                       alt={`${formattedName} normal sprite`}
-                      width={SPRITE_SIZE}
-                      height={SPRITE_SIZE}
+                      width={UI_CONFIG.SPRITE_SIZE}
+                      height={UI_CONFIG.SPRITE_SIZE}
                       className="w-full h-full object-contain"
                       priority={false}
                     />
@@ -76,8 +74,8 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
                     <Image
                       src={pokemon.sprites.front_shiny}
                       alt={`${formattedName} shiny sprite`}
-                      width={SPRITE_SIZE}
-                      height={SPRITE_SIZE}
+                      width={UI_CONFIG.SPRITE_SIZE}
+                      height={UI_CONFIG.SPRITE_SIZE}
                       className="w-full h-full object-contain"
                       priority={false}
                     />
@@ -100,11 +98,11 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
             <div className="space-y-3" role="list" aria-label="Pokemon statistics">
               {pokemon.stats.map((stat) => {
                 const statName = formatName(stat.stat.name);
-                const statPercentage = Math.min((stat.base_stat / MAX_STAT_VALUE) * 100, 100);
+                const statPercentage = Math.min((stat.base_stat / UI_CONFIG.MAX_STAT_VALUE) * 100, 100);
                 return (
                   <div key={stat.stat.name} role="listitem">
                     <div className="flex justify-between mb-1">
-                      <span className="capitalize text-black dark:text-zinc-50" id={`stat-${stat.stat.name}`}>
+                      <span className="text-black dark:text-zinc-50" id={`stat-${stat.stat.name}`}>
                         {statName}
                       </span>
                       <span
@@ -119,7 +117,7 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
                       role="progressbar"
                       aria-valuenow={stat.base_stat}
                       aria-valuemin={0}
-                      aria-valuemax={MAX_STAT_VALUE}
+                      aria-valuemax={UI_CONFIG.MAX_STAT_VALUE}
                       aria-labelledby={`stat-${stat.stat.name}`}
                     >
                       <div
@@ -145,15 +143,10 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
               items={locations.map((name) => ({ name }))}
               hrefPattern="/locations/{name}"
               titleSize="medium"
-              itemsPerPage={ITEMS_PER_PAGE_DETAIL}
+              itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE_DETAIL}
             />
           ) : (
-            <>
-              <h2 className="text-2xl font-semibold mb-4 text-black dark:text-zinc-50">
-                Locations
-              </h2>
-              <EmptyState message="No locations found" />
-            </>
+            <EmptyStateCard title="Locations" message="No locations found" />
           )}
         </DetailCard>
 
@@ -165,20 +158,15 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
               items={pokemon.moves.map((move) => ({ name: move.move.name }))}
               hrefPattern="/moves/{name}"
               titleSize="medium"
-              itemsPerPage={ITEMS_PER_PAGE_DETAIL}
+              itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE_DETAIL}
             />
           ) : (
-            <>
-              <h2 className="text-2xl font-semibold mb-4 text-black dark:text-zinc-50">
-                Moves
-              </h2>
-              <EmptyState message="No moves found" />
-            </>
+            <EmptyStateCard title="Moves" message="No moves found" />
           )}
         </DetailCard>
       </DetailPageLayout>
     );
-  } catch (error) {
+  } catch {
     notFound();
   }
 }

@@ -1,7 +1,12 @@
 import SearchableList from "../components/SearchableList";
 import { getGenerationList } from "../lib/api";
-import { formatGenerationName } from "../lib/format";
-import { ITEMS_PER_PAGE } from "../lib/constants";
+import { UI_CONFIG } from "../lib/constants";
+import { generateDetailMetadata } from "../lib/metadata";
+
+export const metadata = generateDetailMetadata(
+  "generation",
+  "Browse all Pokemon generations in the Pokedex."
+);
 
 export default async function GenerationsPage() {
   const generations = await getGenerationList();
@@ -11,8 +16,8 @@ export default async function GenerationsPage() {
       title="Generations"
       items={generations}
       hrefPattern="/generations/{name}"
-      formatName={formatGenerationName}
-      itemsPerPage={ITEMS_PER_PAGE}
+      formatType="generation"
+      itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE}
     />
   );
 }

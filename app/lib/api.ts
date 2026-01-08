@@ -1,7 +1,6 @@
-import { API_ENDPOINTS } from "./constants";
+import { API_ENDPOINTS, API_CONFIG } from "./constants";
 import type {
   PokemonData,
-  PokemonListItem,
   LocationData,
   LocationArea,
   MoveData,
@@ -11,11 +10,17 @@ import type {
   LocationAreaData,
 } from "./types";
 
+// Generic list item type for API responses
+export type ListItem = {
+  name: string;
+  url: string;
+};
+
 // Generic fetch with error handling
 async function fetchAPI<T>(url: string): Promise<T> {
   try {
     const response = await fetch(url, {
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      next: { revalidate: API_CONFIG.CACHE_REVALIDATE },
     });
 
     if (!response.ok) {
@@ -32,10 +37,13 @@ async function fetchAPI<T>(url: string): Promise<T> {
 }
 
 // Helper to fetch all list pages
-async function fetchAllList(endpoint: string, pageSize: number = 1000): Promise<PokemonListItem[]> {
+async function fetchAllList(
+  endpoint: string,
+  pageSize: number = API_CONFIG.DEFAULT_PAGE_SIZE
+): Promise<ListItem[]> {
   let offset = 0;
   let total = Number.MAX_SAFE_INTEGER;
-  const results: PokemonListItem[] = [];
+  const results: ListItem[] = [];
 
   while (results.length < total) {
     const data: PokeAPIListResponse = await fetchAPI(
@@ -62,7 +70,7 @@ async function fetchAllList(endpoint: string, pageSize: number = 1000): Promise<
 }
 
 // Pokemon API functions
-export async function getPokemonList(limit?: number): Promise<PokemonListItem[]> {
+export async function getPokemonList(limit?: number): Promise<ListItem[]> {
   if (limit) {
     const data: PokeAPIListResponse = await fetchAPI(
       `${API_ENDPOINTS.POKEMON}?limit=${limit}`
@@ -98,7 +106,7 @@ export async function getPokemonLocations(name: string): Promise<string[]> {
 }
 
 // Location API functions
-export async function getLocationList(limit?: number): Promise<Array<{ name: string; url: string }>> {
+export async function getLocationList(limit?: number): Promise<ListItem[]> {
   if (limit) {
     const data: PokeAPIListResponse = await fetchAPI(
       `${API_ENDPOINTS.LOCATION}?limit=${limit}`
@@ -119,7 +127,7 @@ export async function getLocationAreas(areaUrls: string[]): Promise<LocationArea
 }
 
 // Move API functions
-export async function getMoveList(limit?: number): Promise<Array<{ name: string; url: string }>> {
+export async function getMoveList(limit?: number): Promise<ListItem[]> {
   if (limit) {
     const data: PokeAPIListResponse = await fetchAPI(
       `${API_ENDPOINTS.MOVE}?limit=${limit}`
@@ -134,7 +142,7 @@ export async function getMove(name: string): Promise<MoveData> {
 }
 
 // Generation API functions
-export async function getGenerationList(): Promise<Array<{ name: string; url: string }>> {
+export async function getGenerationList(): Promise<ListItem[]> {
   const data: PokeAPIListResponse = await fetchAPI(API_ENDPOINTS.GENERATION);
   return data.results;
 }

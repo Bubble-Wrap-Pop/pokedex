@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
-import EmptyState from "../../components/EmptyState";
+import EmptyStateCard from "../../components/EmptyStateCard";
 import SearchableList from "../../components/SearchableList";
 import { getGeneration } from "../../lib/api";
-import type { GenerationData } from "../../lib/types";
 import { formatGenerationName, formatName } from "../../lib/format";
-import { ITEMS_PER_PAGE_DETAIL } from "../../lib/constants";
+import { UI_CONFIG } from "../../lib/constants";
+import { generateDetailMetadata } from "../../lib/metadata";
 import type { Metadata } from "next";
 
 interface GenerationDetailPageProps {
@@ -16,10 +16,7 @@ interface GenerationDetailPageProps {
 export async function generateMetadata({ params }: GenerationDetailPageProps): Promise<Metadata> {
   const { name } = await params;
   const formattedName = formatGenerationName(name);
-  return {
-    title: `Pokedex – ${formattedName}`,
-    description: `${formattedName} details and Pokémon species.`,
-  };
+  return generateDetailMetadata("generation", `${formattedName} details and Pokémon species.`, name);
 }
 
 export default async function GenerationDetailPage({ params }: GenerationDetailPageProps) {
@@ -44,20 +41,15 @@ export default async function GenerationDetailPage({ params }: GenerationDetailP
               }))}
               hrefPattern="/pokemon/{name}"
               titleSize="medium"
-              itemsPerPage={ITEMS_PER_PAGE_DETAIL}
+              itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE_DETAIL}
             />
           ) : (
-            <>
-              <h2 className="text-2xl font-semibold mb-4 capitalize text-black dark:text-zinc-50">
-                Pokemon Species
-              </h2>
-              <EmptyState message="No Pokemon species found" />
-            </>
+            <EmptyStateCard title="Pokemon Species" message="No Pokemon species found" />
           )}
         </DetailCard>
       </DetailPageLayout>
     );
-  } catch (error) {
+  } catch {
     notFound();
   }
 }

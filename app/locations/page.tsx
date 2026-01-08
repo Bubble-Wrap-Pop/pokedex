@@ -1,6 +1,12 @@
 import SearchableList from "../components/SearchableList";
 import { getLocationList } from "../lib/api";
-import { ITEMS_PER_PAGE } from "../lib/constants";
+import { UI_CONFIG } from "../lib/constants";
+import { generateDetailMetadata } from "../lib/metadata";
+
+export const metadata = generateDetailMetadata(
+  "location",
+  "Browse all Pokemon locations in the Pokedex."
+);
 
 export default async function LocationsPage() {
   const locations = await getLocationList();
@@ -10,7 +16,7 @@ export default async function LocationsPage() {
       title="Locations"
       items={locations}
       hrefPattern="/locations/{name}"
-      itemsPerPage={ITEMS_PER_PAGE}
+      itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE}
     />
   );
 }

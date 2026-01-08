@@ -3,11 +3,12 @@ import type { Metadata } from "next";
 import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
 import EmptyState from "../../components/EmptyState";
+import EmptyStateCard from "../../components/EmptyStateCard";
 import SearchableList from "../../components/SearchableList";
 import { getMove } from "../../lib/api";
-import type { MoveData } from "../../lib/types";
 import { formatName } from "../../lib/format";
-import { ITEMS_PER_PAGE_DETAIL } from "../../lib/constants";
+import { UI_CONFIG } from "../../lib/constants";
+import { generateDetailMetadata } from "../../lib/metadata";
 
 interface MoveDetailPageProps {
   params: Promise<{ name: string }>;
@@ -16,10 +17,7 @@ interface MoveDetailPageProps {
 export async function generateMetadata({ params }: MoveDetailPageProps): Promise<Metadata> {
   const { name } = await params;
   const formattedName = formatName(name);
-  return {
-    title: `Pokedex – ${formattedName}`,
-    description: `${formattedName} stats, flavor text, and Pokémon that can learn it.`,
-  };
+  return generateDetailMetadata("move", `${formattedName} stats, flavor text, and Pokémon that can learn it.`, name);
 }
 
 export default async function MoveDetailPage({ params }: MoveDetailPageProps) {
@@ -73,7 +71,7 @@ export default async function MoveDetailPage({ params }: MoveDetailPageProps) {
           <div className="space-y-4">
             {Object.entries(flavorTextByVersion).map(([version, text]) => (
               <div key={version}>
-                <p className="font-semibold capitalize text-black dark:text-zinc-50 mb-1">
+                <p className="font-semibold text-black dark:text-zinc-50 mb-1">
                   {version}
                 </p>
                 <p className="text-zinc-600 dark:text-zinc-400">{text}</p>
@@ -93,20 +91,18 @@ export default async function MoveDetailPage({ params }: MoveDetailPageProps) {
               items={move.learned_by_pokemon.map((p) => ({ name: p.name }))}
               hrefPattern="/pokemon/{name}"
               titleSize="medium"
-              itemsPerPage={ITEMS_PER_PAGE_DETAIL}
+              itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE_DETAIL}
             />
           ) : (
-            <>
-              <h2 className="text-2xl font-semibold mb-4 text-black dark:text-zinc-50">
-                Pokemon that can learn this move
-              </h2>
-              <EmptyState message="No Pokemon can learn this move" />
-            </>
+            <EmptyStateCard
+              title="Pokemon that can learn this move"
+              message="No Pokemon can learn this move"
+            />
           )}
         </DetailCard>
       </DetailPageLayout>
     );
-  } catch (error) {
+  } catch {
     notFound();
   }
 }

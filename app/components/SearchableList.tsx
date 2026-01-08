@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo, useDeferredValue, useCallback } from "react";
 import Link from "next/link";
-import { formatName } from "../lib/format";
-import { ITEMS_PER_PAGE } from "../lib/constants";
+import { formatName, formatGenerationName } from "../lib/format";
+import { UI_CONFIG } from "../lib/constants";
 
 type ListItem = { name: string };
 
@@ -12,7 +12,7 @@ interface SearchableListProps {
   items: Array<ListItem>;
   hrefPattern: string;
   titleSize?: "large" | "medium";
-  formatName?: (name: string) => string;
+  formatType?: "default" | "generation";
   itemsPerPage?: number;
 }
 
@@ -21,8 +21,8 @@ export default function SearchableList({
   items,
   hrefPattern,
   titleSize = "large",
-  formatName: formatNameProp,
-  itemsPerPage = ITEMS_PER_PAGE,
+  formatType = "default",
+  itemsPerPage = UI_CONFIG.ITEMS_PER_PAGE,
 }: SearchableListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(itemsPerPage);
@@ -35,12 +35,15 @@ export default function SearchableList({
     setVisibleCount(itemsPerPage);
   }, [searchQuery, itemsPerPage]);
 
-  const formatItemName = useCallback((name: string) => {
-    if (formatNameProp) {
-      return formatNameProp(name);
-    }
-    return formatName(name);
-  }, [formatNameProp]);
+  const formatItemName = useCallback(
+    (name: string) => {
+      if (formatType === "generation") {
+        return formatGenerationName(name);
+      }
+      return formatName(name);
+    },
+    [formatType]
+  );
 
   // Memoize filtered items for better performance
   const filteredItems = useMemo(() => {
@@ -109,11 +112,7 @@ export default function SearchableList({
               const formattedName = formatItemName(item.name);
               const href = hrefPattern.replace("{name}", item.name);
               const content = (
-                <h3
-                  className={`font-semibold text-lg text-black dark:text-zinc-50 ${
-                    formatNameProp ? "" : "capitalize"
-                  }`}
-                >
+                <h3 className="font-semibold text-lg text-black dark:text-zinc-50">
                   {formattedName}
                 </h3>
               );
