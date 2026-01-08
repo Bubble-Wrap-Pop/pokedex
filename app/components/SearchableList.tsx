@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useDeferredValue, useCallback } from "react";
 import Link from "next/link";
 import { formatName } from "../lib/format";
 import { ITEMS_PER_PAGE } from "../lib/constants";
@@ -9,70 +9,46 @@ type ListItem = { name: string };
 
 interface SearchableListProps {
   title: string;
-  apiUrl?: string;
-  items?: Array<ListItem>;
+  items: Array<ListItem>;
   hrefPattern: string;
   titleSize?: "large" | "medium";
   formatName?: (name: string) => string;
+  itemsPerPage?: number;
 }
 
 export default function SearchableList({
   title,
-  apiUrl,
-  items: itemsProp,
+  items,
   hrefPattern,
   titleSize = "large",
   formatName: formatNameProp,
+  itemsPerPage = ITEMS_PER_PAGE,
 }: SearchableListProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [items, setItems] = useState<Array<ListItem>>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const [visibleCount, setVisibleCount] = useState(itemsPerPage);
 
-  useEffect(() => {
-    if (itemsProp) {
-      setItems(itemsProp);
-      setLoading(false);
-      setError(null);
-    } else if (apiUrl) {
-      fetchItems();
-    } else {
-      setLoading(false);
-      setItems([]);
-    }
-  }, [apiUrl, itemsProp]);
+  // Defer search query for better performance
+  const deferredSearchQuery = useDeferredValue(searchQuery);
 
   // Reset visible items when search query changes
   useEffect(() => {
-    setVisibleCount(ITEMS_PER_PAGE);
-  }, [searchQuery]);
+    setVisibleCount(itemsPerPage);
+  }, [searchQuery, itemsPerPage]);
 
-  const fetchItems = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch(apiUrl!);
-      const data = await response.json();
-      setItems(data.results || []);
-    } catch (err) {
-      setError("Unable to load data. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const formatItemName = (name: string) => {
+  const formatItemName = useCallback((name: string) => {
     if (formatNameProp) {
       return formatNameProp(name);
     }
     return formatName(name);
-  };
+  }, [formatNameProp]);
 
-  const filteredItems = items.filter((item) => {
-    const formattedName = formatItemName(item.name);
-    return formattedName.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+  // Memoize filtered items for better performance
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+      const formattedName = formatItemName(item.name);
+      return formattedName.toLowerCase().includes(deferredSearchQuery.toLowerCase());
+    });
+  }, [items, deferredSearchQuery, formatItemName]);
 
   // Show-more calculations
   const totalFiltered = filteredItems.length;
@@ -85,7 +61,7 @@ export default function SearchableList({
       : "text-2xl font-semibold mb-4 capitalize text-black dark:text-zinc-50";
 
   const handleShowMore = () => {
-    setVisibleCount((prev) => Math.min(prev + ITEMS_PER_PAGE, totalFiltered));
+    setVisibleCount((prev) => Math.min(prev + itemsPerPage, totalFiltered));
   };
 
   return (
@@ -108,28 +84,16 @@ export default function SearchableList({
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           aria-label={`Search ${title}`}
-          aria-describedby={
-            loading ? undefined : `search-results-${title.toLowerCase().replace(/\s+/g, "-")}`
-          }
+          aria-describedby={`search-results-${title.toLowerCase().replace(/\s+/g, "-")}`}
         />
-        {!loading && (
-          <span className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-nowrap" aria-live="polite">
-            {searchQuery.trim().length > 0
-              ? `${totalFiltered} of ${items.length}`
-              : `${items.length}`}
-          </span>
-        )}
+        <span className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-nowrap" aria-live="polite">
+          {searchQuery.trim().length > 0
+            ? `${totalFiltered} of ${items.length}`
+            : `${items.length}`}
+        </span>
       </div>
 
-      {loading ? (
-        <div className="text-center py-12 text-zinc-600 dark:text-zinc-400" role="status" aria-live="polite">
-          Loading...
-        </div>
-      ) : error ? (
-        <div className="text-center py-12 text-red-600 dark:text-red-400" role="status" aria-live="polite">
-          {error}
-        </div>
-      ) : items.length === 0 ? (
+      {items.length === 0 ? (
         <div className="text-center py-12 text-zinc-600 dark:text-zinc-400" role="status" aria-live="polite">
           No {title.toLowerCase()} available.
         </div>
@@ -182,13 +146,13 @@ export default function SearchableList({
         </>
       )}
 
-      {!loading && !error && items.length > 0 && filteredItems.length === 0 && (
+      {items.length > 0 && filteredItems.length === 0 && (
         <div
           className="text-center py-12 text-zinc-600 dark:text-zinc-400"
           role="status"
           aria-live="polite"
         >
-          No {title} found matching "{searchQuery}"
+          No {title} found matching "{deferredSearchQuery}"
         </div>
       )}
     </div>

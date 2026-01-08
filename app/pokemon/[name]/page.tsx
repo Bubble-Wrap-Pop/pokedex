@@ -1,10 +1,13 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import BackButton from "../../components/BackButton";
+import DetailPageLayout from "../../components/DetailPageLayout";
+import DetailCard from "../../components/DetailCard";
+import EmptyState from "../../components/EmptyState";
 import SearchableList from "../../components/SearchableList";
 import { getPokemon, getPokemonLocations } from "../../lib/api";
 import type { PokemonData } from "../../lib/types";
 import { formatName } from "../../lib/format";
+import { ITEMS_PER_PAGE_DETAIL, MAX_STAT_VALUE, SPRITE_SIZE } from "../../lib/constants";
 import type { Metadata } from "next";
 
 interface PokemonDetailPageProps {
@@ -32,18 +35,10 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
     const formattedName = formatName(pokemon.name);
 
     return (
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <BackButton />
-        <h1 className="text-4xl font-bold mb-8 capitalize text-black dark:text-zinc-50">
-          {formattedName}
-        </h1>
-
+      <DetailPageLayout title={formattedName}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Sprites */}
-          <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 border border-zinc-200 dark:border-zinc-800">
-            <h2 className="text-2xl font-semibold mb-6 text-black dark:text-zinc-50">
-              Sprites
-            </h2>
+          <DetailCard title="Sprites">
             <div className="grid grid-cols-2 gap-4" role="group" aria-label="Pokemon sprites">
               {/* Normal Sprite */}
               <div className="flex flex-col items-center">
@@ -55,8 +50,8 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
                     <Image
                       src={pokemon.sprites.front_default}
                       alt={`${formattedName} normal sprite`}
-                      width={160}
-                      height={160}
+                      width={SPRITE_SIZE}
+                      height={SPRITE_SIZE}
                       className="w-full h-full object-contain"
                       priority={false}
                     />
@@ -81,8 +76,8 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
                     <Image
                       src={pokemon.sprites.front_shiny}
                       alt={`${formattedName} shiny sprite`}
-                      width={160}
-                      height={160}
+                      width={SPRITE_SIZE}
+                      height={SPRITE_SIZE}
                       className="w-full h-full object-contain"
                       priority={false}
                     />
@@ -98,17 +93,14 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
                 )}
               </div>
             </div>
-          </div>
+          </DetailCard>
 
           {/* Stats */}
-          <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 border border-zinc-200 dark:border-zinc-800">
-            <h2 className="text-2xl font-semibold mb-4 text-black dark:text-zinc-50">
-              Stats
-            </h2>
+          <DetailCard title="Stats">
             <div className="space-y-3" role="list" aria-label="Pokemon statistics">
               {pokemon.stats.map((stat) => {
                 const statName = formatName(stat.stat.name);
-                const statPercentage = Math.min((stat.base_stat / 255) * 100, 100);
+                const statPercentage = Math.min((stat.base_stat / MAX_STAT_VALUE) * 100, 100);
                 return (
                   <div key={stat.stat.name} role="listitem">
                     <div className="flex justify-between mb-1">
@@ -127,7 +119,7 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
                       role="progressbar"
                       aria-valuenow={stat.base_stat}
                       aria-valuemin={0}
-                      aria-valuemax={255}
+                      aria-valuemax={MAX_STAT_VALUE}
                       aria-labelledby={`stat-${stat.stat.name}`}
                     >
                       <div
@@ -142,49 +134,49 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
                 );
               })}
             </div>
-          </div>
+          </DetailCard>
         </div>
 
         {/* Locations */}
-        <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 border border-zinc-200 dark:border-zinc-800 mb-8">
+        <DetailCard className="mb-8">
           {locations.length > 0 ? (
             <SearchableList
               title="Locations"
               items={locations.map((name) => ({ name }))}
               hrefPattern="/locations/{name}"
               titleSize="medium"
+              itemsPerPage={ITEMS_PER_PAGE_DETAIL}
             />
           ) : (
             <>
               <h2 className="text-2xl font-semibold mb-4 text-black dark:text-zinc-50">
                 Locations
               </h2>
-              <p className="text-zinc-600 dark:text-zinc-400">
-                No locations found
-              </p>
+              <EmptyState message="No locations found" />
             </>
           )}
-        </div>
+        </DetailCard>
 
         {/* Moves */}
-        <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 border border-zinc-200 dark:border-zinc-800">
+        <DetailCard>
           {pokemon.moves.length > 0 ? (
             <SearchableList
               title="Moves"
               items={pokemon.moves.map((move) => ({ name: move.move.name }))}
               hrefPattern="/moves/{name}"
               titleSize="medium"
+              itemsPerPage={ITEMS_PER_PAGE_DETAIL}
             />
           ) : (
             <>
               <h2 className="text-2xl font-semibold mb-4 text-black dark:text-zinc-50">
                 Moves
               </h2>
-              <p className="text-zinc-600 dark:text-zinc-400">No moves found</p>
+              <EmptyState message="No moves found" />
             </>
           )}
-        </div>
-      </div>
+        </DetailCard>
+      </DetailPageLayout>
     );
   } catch (error) {
     notFound();

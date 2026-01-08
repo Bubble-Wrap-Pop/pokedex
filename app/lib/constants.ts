@@ -1,4 +1,4 @@
-export const POKEAPI_BASE_URL = "https://pokeapi.co/api/v2";
+const POKEAPI_BASE_URL = "https://pokeapi.co/api/v2";
 
 export const API_ENDPOINTS = {
   POKEMON: `${POKEAPI_BASE_URL}/pokemon`,
@@ -8,3 +8,6 @@ export const API_ENDPOINTS = {
 } as const;
 
 export const ITEMS_PER_PAGE = 100;
+export const ITEMS_PER_PAGE_DETAIL = 20;
+export const MAX_STAT_VALUE = 255;
+export const SPRITE_SIZE = 160;
