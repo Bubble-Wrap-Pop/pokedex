@@ -4,7 +4,7 @@ A comprehensive Pokemon Pokedex application built with Next.js, TypeScript, and 
 
 ## 🚀 Live Demo
 
-**Deployed Application:** [Add your Vercel deployment URL here]
+**Deployed Application:** https://pokedex-beta-five-20.vercel.app
 
 ## ✨ Features
 
@@ -50,7 +50,7 @@ A comprehensive Pokemon Pokedex application built with Next.js, TypeScript, and 
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/Bubble-Wrap-Pop/pokedex.git
    cd pokedex
    ```
 
