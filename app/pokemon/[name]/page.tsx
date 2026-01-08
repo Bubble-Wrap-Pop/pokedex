@@ -4,6 +4,7 @@ import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
 import EmptyStateCard from "../../components/EmptyStateCard";
 import SearchableList from "../../components/SearchableList";
+import MovesList from "../../components/MovesList";
 import { getPokemon, getPokemonLocations } from "../../lib/api";
 import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
@@ -153,7 +154,7 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
         {/* Moves */}
         <DetailCard>
           {pokemon.moves.length > 0 ? (
-            <SearchableList
+            <MovesList
               title="Moves"
               items={pokemon.moves.map((move) => ({ name: move.move.name }))}
               hrefPattern="/moves/{name}"

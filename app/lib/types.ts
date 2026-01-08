@@ -50,6 +50,12 @@ export interface MoveData {
   accuracy: number | null;
   pp: number | null;
   power: number | null;
+  type: {
+    name: string;
+  };
+  damage_class: {
+    name: string;
+  } | null;
   flavor_text_entries: Array<{
     flavor_text: string;
     version_group: {

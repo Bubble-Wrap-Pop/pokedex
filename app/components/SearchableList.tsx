@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useDeferredValue, useCallback } from "rea
 import Link from "next/link";
 import { formatName, formatGenerationName } from "../lib/format";
 import { UI_CONFIG } from "../lib/constants";
+import ColoredListItem from "./ColoredListItem";
 
 type ListItem = { name: string };
 
@@ -14,6 +15,7 @@ interface SearchableListProps {
   titleSize?: "large" | "medium";
   formatType?: "default" | "generation";
   itemsPerPage?: number;
+  getItemColor?: (name: string) => Promise<string>;
 }
 
 export default function SearchableList({
@@ -23,6 +25,7 @@ export default function SearchableList({
   titleSize = "large",
   formatType = "default",
   itemsPerPage = UI_CONFIG.ITEMS_PER_PAGE,
+  getItemColor,
 }: SearchableListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(itemsPerPage);
@@ -111,6 +114,21 @@ export default function SearchableList({
             {paginatedItems.map((item) => {
               const formattedName = formatItemName(item.name);
               const href = hrefPattern.replace("{name}", item.name);
+
+              // Use ColoredListItem if getItemColor is provided
+              if (getItemColor) {
+                return (
+                  <ColoredListItem
+                    key={item.name}
+                    name={item.name}
+                    href={href}
+                    formattedName={formattedName}
+                    getItemColor={getItemColor}
+                  />
+                );
+              }
+
+              // Default styling without colors
               const content = (
                 <h3 className="font-semibold text-lg text-black dark:text-zinc-50">
                   {formattedName}
