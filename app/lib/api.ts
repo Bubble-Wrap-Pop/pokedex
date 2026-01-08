@@ -31,12 +31,45 @@ async function fetchAPI<T>(url: string): Promise<T> {
   }
 }
 
+// Helper to fetch all list pages
+async function fetchAllList(endpoint: string, pageSize: number = 1000): Promise<PokemonListItem[]> {
+  let offset = 0;
+  let total = Number.MAX_SAFE_INTEGER;
+  const results: PokemonListItem[] = [];
+
+  while (results.length < total) {
+    const data: PokeAPIListResponse = await fetchAPI(
+      `${endpoint}?limit=${pageSize}&offset=${offset}`
+    );
+
+    if (typeof data.count === "number") {
+      total = data.count;
+    } else if (data.results.length < pageSize) {
+      // If count is missing, infer total from final short page
+      total = results.length + data.results.length;
+    }
+
+    results.push(...data.results);
+
+    if (data.results.length === 0) {
+      break;
+    }
+
+    offset += pageSize;
+  }
+
+  return results;
+}
+
 // Pokemon API functions
-export async function getPokemonList(limit: number = 200): Promise<PokemonListItem[]> {
-  const data: PokeAPIListResponse = await fetchAPI(
-    `${API_ENDPOINTS.POKEMON}?limit=${limit}`
-  );
-  return data.results;
+export async function getPokemonList(limit?: number): Promise<PokemonListItem[]> {
+  if (limit) {
+    const data: PokeAPIListResponse = await fetchAPI(
+      `${API_ENDPOINTS.POKEMON}?limit=${limit}`
+    );
+    return data.results;
+  }
+  return fetchAllList(API_ENDPOINTS.POKEMON);
 }
 
 export async function getPokemon(name: string): Promise<PokemonData> {
@@ -65,11 +98,14 @@ export async function getPokemonLocations(name: string): Promise<string[]> {
 }
 
 // Location API functions
-export async function getLocationList(limit: number = 200): Promise<Array<{ name: string; url: string }>> {
-  const data: PokeAPIListResponse = await fetchAPI(
-    `${API_ENDPOINTS.LOCATION}?limit=${limit}`
-  );
-  return data.results;
+export async function getLocationList(limit?: number): Promise<Array<{ name: string; url: string }>> {
+  if (limit) {
+    const data: PokeAPIListResponse = await fetchAPI(
+      `${API_ENDPOINTS.LOCATION}?limit=${limit}`
+    );
+    return data.results;
+  }
+  return fetchAllList(API_ENDPOINTS.LOCATION);
 }
 
 export async function getLocation(name: string): Promise<LocationData> {
@@ -83,11 +119,14 @@ export async function getLocationAreas(areaUrls: string[]): Promise<LocationArea
 }
 
 // Move API functions
-export async function getMoveList(limit: number = 200): Promise<Array<{ name: string; url: string }>> {
-  const data: PokeAPIListResponse = await fetchAPI(
-    `${API_ENDPOINTS.MOVE}?limit=${limit}`
-  );
-  return data.results;
+export async function getMoveList(limit?: number): Promise<Array<{ name: string; url: string }>> {
+  if (limit) {
+    const data: PokeAPIListResponse = await fetchAPI(
+      `${API_ENDPOINTS.MOVE}?limit=${limit}`
+    );
+    return data.results;
+  }
+  return fetchAllList(API_ENDPOINTS.MOVE);
 }
 
 export async function getMove(name: string): Promise<MoveData> {

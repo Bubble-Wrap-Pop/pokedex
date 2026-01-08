@@ -76,6 +76,7 @@ export interface GenerationData {
 
 // API Response types
 export interface PokeAPIListResponse {
+  count?: number;
   results: Array<{
     name: string;
     url: string;

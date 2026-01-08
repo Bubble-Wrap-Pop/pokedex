@@ -6,3 +6,5 @@ export const API_ENDPOINTS = {
   MOVE: `${POKEAPI_BASE_URL}/move`,
   GENERATION: `${POKEAPI_BASE_URL}/generation`,
 } as const;
+
+export const ITEMS_PER_PAGE = 100;
