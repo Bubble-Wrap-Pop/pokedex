@@ -7,6 +7,7 @@ import { getGeneration } from "../../lib/api";
 import { formatGenerationName, formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
+import { getGenerationColor } from "../../lib/regionColors";
 import type { Metadata } from "next";
 
 interface GenerationDetailPageProps {
@@ -28,9 +29,13 @@ export default async function GenerationDetailPage({ params }: GenerationDetailP
     const subtitle = generation.main_region
       ? `Main Region: ${formatName(generation.main_region.name)}`
       : undefined;
+    const generationColor = getGenerationColor(generation.name);
 
     return (
-      <DetailPageLayout title={formattedName} subtitle={subtitle}>
+      <>
+        {/* Colored header accent */}
+        <div className={`h-2 bg-gradient-to-r ${generationColor} w-full`} />
+        <DetailPageLayout title={formattedName} subtitle={subtitle}>
         {/* Pokemon Species */}
         <DetailCard>
           {generation.pokemon_species && generation.pokemon_species.length > 0 ? (
@@ -48,6 +53,7 @@ export default async function GenerationDetailPage({ params }: GenerationDetailP
           )}
         </DetailCard>
       </DetailPageLayout>
+      </>
     );
   } catch {
     notFound();

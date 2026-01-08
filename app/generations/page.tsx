@@ -1,4 +1,4 @@
-import SearchableList from "../components/SearchableList";
+import GenerationList from "../components/GenerationList";
 import { getGenerationList } from "../lib/api";
 import { UI_CONFIG } from "../lib/constants";
 import { generateDetailMetadata } from "../lib/metadata";
@@ -12,11 +12,10 @@ export default async function GenerationsPage() {
   const generations = await getGenerationList();
 
   return (
-    <SearchableList
+    <GenerationList
       title="Generations"
       items={generations}
       hrefPattern="/generations/{name}"
-      formatType="generation"
       itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE}
     />
   );

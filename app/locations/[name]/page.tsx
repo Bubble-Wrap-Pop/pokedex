@@ -9,6 +9,7 @@ import { getLocation, getLocationAreas } from "../../lib/api";
 import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
+import { getRegionColor } from "../../lib/regionColors";
 
 interface LocationDetailPageProps {
   params: Promise<{ name: string }>;
@@ -36,9 +37,13 @@ export default async function LocationDetailPage({ params }: LocationDetailPageP
     const subtitle = location.region
       ? `Region: ${formatName(location.region.name)}`
       : undefined;
+    const regionColor = getRegionColor(location.region?.name);
 
     return (
-      <DetailPageLayout title={formattedName} subtitle={subtitle}>
+      <>
+        {/* Colored header accent */}
+        <div className={`h-2 bg-gradient-to-r ${regionColor} w-full`} />
+        <DetailPageLayout title={formattedName} subtitle={subtitle}>
         <div className="space-y-6">
           {locationAreas.map((area) => {
             const areaName = formatName(area.name);
@@ -70,6 +75,7 @@ export default async function LocationDetailPage({ params }: LocationDetailPageP
           </DetailCard>
         )}
       </DetailPageLayout>
+      </>
     );
   } catch {
     notFound();

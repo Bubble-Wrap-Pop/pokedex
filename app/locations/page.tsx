@@ -1,4 +1,4 @@
-import SearchableList from "../components/SearchableList";
+import LocationList from "../components/LocationList";
 import { getLocationList } from "../lib/api";
 import { UI_CONFIG } from "../lib/constants";
 import { generateDetailMetadata } from "../lib/metadata";
@@ -12,7 +12,7 @@ export default async function LocationsPage() {
   const locations = await getLocationList();
 
   return (
-    <SearchableList
+    <LocationList
       title="Locations"
       items={locations}
       hrefPattern="/locations/{name}"

@@ -49,7 +49,10 @@ export default async function MoveDetailPage({ params }: MoveDetailPageProps) {
       : null;
 
     return (
-      <DetailPageLayout title={formattedName}>
+      <>
+        {/* Colored header accent */}
+        <div className={`h-2 bg-gradient-to-r ${moveTypeColor} w-full`} />
+        <DetailPageLayout title={formattedName}>
         {/* Move Type and Damage Class */}
         <DetailCard title="Type & Category" className="mb-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -144,6 +147,7 @@ export default async function MoveDetailPage({ params }: MoveDetailPageProps) {
           )}
         </DetailCard>
       </DetailPageLayout>
+      </>
     );
   } catch {
     notFound();

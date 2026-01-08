@@ -10,6 +10,7 @@ import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
 import { getMoveTypeColor } from "../../lib/moveColors";
+import { getPokemonColor } from "../../lib/pokemonColors";
 import type { Metadata } from "next";
 
 interface PokemonDetailPageProps {
@@ -33,9 +34,13 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
     ]);
 
     const formattedName = formatName(pokemon.name);
+    const pokemonColor = getPokemonColor(pokemon.types);
 
     return (
-      <DetailPageLayout title={formattedName}>
+      <>
+        {/* Colored header accent */}
+        <div className={`h-2 bg-gradient-to-r ${pokemonColor} w-full`} />
+        <DetailPageLayout title={formattedName}>
         {/* Types */}
         <DetailCard title="Types" className="mb-8">
           <div className="flex flex-wrap gap-3">
@@ -189,6 +194,7 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
           )}
         </DetailCard>
       </DetailPageLayout>
+      </>
     );
   } catch {
     notFound();
