@@ -1,10 +1,13 @@
 import SearchableList from "../components/SearchableList";
+import { getPokemonList } from "../lib/api";
 
-export default function PokemonPage() {
+export default async function PokemonPage() {
+  const pokemon = await getPokemonList();
+
   return (
     <SearchableList
       title="Pokemon"
-      apiUrl="https://pokeapi.co/api/v2/pokemon?limit=1000"
+      items={pokemon}
       hrefPattern="/pokemon/{name}"
     />
   );

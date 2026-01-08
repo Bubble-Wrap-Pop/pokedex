@@ -1,10 +1,13 @@
 import SearchableList from "../components/SearchableList";
+import { getMoveList } from "../lib/api";
 
-export default function MovesPage() {
+export default async function MovesPage() {
+  const moves = await getMoveList();
+
   return (
     <SearchableList
       title="Moves"
-      apiUrl="https://pokeapi.co/api/v2/move?limit=1000"
+      items={moves}
       hrefPattern="/moves/{name}"
     />
   );

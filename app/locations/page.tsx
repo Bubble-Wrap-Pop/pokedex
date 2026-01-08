@@ -1,10 +1,13 @@
 import SearchableList from "../components/SearchableList";
+import { getLocationList } from "../lib/api";
 
-export default function LocationsPage() {
+export default async function LocationsPage() {
+  const locations = await getLocationList();
+
   return (
     <SearchableList
       title="Locations"
-      apiUrl="https://pokeapi.co/api/v2/location?limit=1000"
+      items={locations}
       hrefPattern="/locations/{name}"
     />
   );

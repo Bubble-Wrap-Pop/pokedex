@@ -1,10 +1,9 @@
 import SearchableList from "../components/SearchableList";
+import { getGenerationList } from "../lib/api";
+import GenerationListClient from "./GenerationListClient";
 
-export default function GenerationsPage() {
-  return (
-    <SearchableList
-      title="Generations"
-      apiUrl="https://pokeapi.co/api/v2/generation"
-    />
-  );
+export default async function GenerationsPage() {
+  const generations = await getGenerationList();
+
+  return <GenerationListClient generations={generations} />;
 }
