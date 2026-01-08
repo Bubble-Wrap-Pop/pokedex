@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
 import EmptyStateCard from "../../components/EmptyStateCard";
-import SearchableList from "../../components/SearchableList";
+import PokemonList from "../../components/PokemonList";
 import { getGeneration } from "../../lib/api";
 import { formatGenerationName, formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
@@ -34,7 +34,7 @@ export default async function GenerationDetailPage({ params }: GenerationDetailP
         {/* Pokemon Species */}
         <DetailCard>
           {generation.pokemon_species && generation.pokemon_species.length > 0 ? (
-            <SearchableList
+            <PokemonList
               title="Pokemon Species"
               items={generation.pokemon_species.map((species) => ({
                 name: species.name,

@@ -5,7 +5,7 @@ import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
 import EmptyState from "../../components/EmptyState";
 import EmptyStateCard from "../../components/EmptyStateCard";
-import SearchableList from "../../components/SearchableList";
+import PokemonList from "../../components/PokemonList";
 import { getMove } from "../../lib/api";
 import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
@@ -129,7 +129,7 @@ export default async function MoveDetailPage({ params }: MoveDetailPageProps) {
         {/* Pokemon that can learn this move */}
         <DetailCard>
           {move.learned_by_pokemon && move.learned_by_pokemon.length > 0 ? (
-            <SearchableList
+            <PokemonList
               title="Pokemon that can learn this move"
               items={move.learned_by_pokemon.map((p) => ({ name: p.name }))}
               hrefPattern="/pokemon/{name}"

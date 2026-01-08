@@ -4,7 +4,7 @@ import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
 import EmptyState from "../../components/EmptyState";
 import EmptyStateCard from "../../components/EmptyStateCard";
-import SearchableList from "../../components/SearchableList";
+import PokemonList from "../../components/PokemonList";
 import { getLocation, getLocationAreas } from "../../lib/api";
 import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
@@ -47,7 +47,7 @@ export default async function LocationDetailPage({ params }: LocationDetailPageP
             return (
               <DetailCard key={area.name}>
                 {pokemon.length > 0 ? (
-                  <SearchableList
+                  <PokemonList
                     title={areaName}
                     items={pokemon.map((encounter) => ({
                       name: encounter.pokemon.name,

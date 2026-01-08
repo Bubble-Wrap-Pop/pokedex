@@ -1,6 +1,11 @@
 // Pokemon types
 export interface PokemonData {
   name: string;
+  types: Array<{
+    type: {
+      name: string;
+    };
+  }>;
   stats: Array<{
     base_stat: number;
     stat: { name: string };

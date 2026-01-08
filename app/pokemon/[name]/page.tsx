@@ -9,6 +9,7 @@ import { getPokemon, getPokemonLocations } from "../../lib/api";
 import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
+import { getMoveTypeColor } from "../../lib/moveColors";
 import type { Metadata } from "next";
 
 interface PokemonDetailPageProps {
@@ -35,6 +36,28 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
 
     return (
       <DetailPageLayout title={formattedName}>
+        {/* Types */}
+        <DetailCard title="Types" className="mb-8">
+          <div className="flex flex-wrap gap-3">
+            {pokemon.types.length > 0 ? (
+              pokemon.types.map((typeEntry) => {
+                const typeName = typeEntry.type.name;
+                const typeColor = getMoveTypeColor(typeName);
+                return (
+                  <div
+                    key={typeName}
+                    className={`inline-block px-4 py-2 rounded-lg bg-gradient-to-br ${typeColor} text-white font-semibold shadow-md`}
+                  >
+                    {formatName(typeName)}
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-zinc-600 dark:text-zinc-400">No types available</p>
+            )}
+          </div>
+        </DetailCard>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Sprites */}
           <DetailCard title="Sprites">
