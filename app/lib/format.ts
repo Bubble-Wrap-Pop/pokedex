@@ -1,18 +1,17 @@
 export function formatName(name: string) {
-  return name
-    .replace(/-/g, " ")
-    .split(" ")
-    .map((word) => word[0]?.toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-export function formatGenerationName(name: string): string {
   const parts = name.replace(/-/g, " ").split(" ");
-  if (parts[0] === "generation") {
+  
+  // Handle generation names (e.g., "generation-i" -> "Generation I")
+  if (parts[0]?.toLowerCase() === "generation") {
     parts[0] = "Generation";
     if (parts[1]) {
       parts[1] = parts[1].toUpperCase();
     }
+    return parts.join(" ");
   }
-  return parts.join(" ");
+  
+  // Regular formatting for all other names
+  return parts
+    .map((word) => word[0]?.toUpperCase() + word.slice(1))
+    .join(" ");
 }

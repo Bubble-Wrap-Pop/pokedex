@@ -4,17 +4,15 @@ import type { Metadata } from "next";
 import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
 import EmptyState from "../../components/EmptyState";
-import EmptyStateCard from "../../components/EmptyStateCard";
 import SearchableList from "../../components/SearchableList";
 import { getMove } from "../../lib/api";
 import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
 import { getMoveTypeColor } from "../../lib/colors";
+import type { DetailPageParams } from "../../lib/types";
 
-interface MoveDetailPageProps {
-  params: Promise<{ name: string }>;
-}
+interface MoveDetailPageProps extends DetailPageParams {}
 
 export async function generateMetadata({ params }: MoveDetailPageProps): Promise<Metadata> {
   const { name } = await params;
@@ -138,7 +136,7 @@ export default async function MoveDetailPage({ params }: MoveDetailPageProps) {
               colorType="pokemon"
             />
           ) : (
-            <EmptyStateCard
+            <EmptyState
               title="Pokemon that can learn this move"
               message="No Pokemon can learn this move"
             />

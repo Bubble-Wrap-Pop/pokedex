@@ -1,13 +1,30 @@
+import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
-import { SpriteSkeleton, StatBarSkeleton } from "../../components/LoadingSkeleton";
-import BackButton from "../../components/BackButton";
+import { ListSkeleton, SearchBarSkeleton, SpriteSkeleton, StatBarSkeleton } from "../../components/LoadingSkeleton";
 
 export default function PokemonDetailLoading() {
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <BackButton />
-      <div className="h-10 bg-zinc-200 dark:bg-zinc-700 rounded w-48 mb-2 animate-pulse"></div>
-      
+    <DetailPageLayout
+      title="Loading..."
+      accentColor="from-gray-400 to-gray-500"
+    >
+      {/* Types */}
+      <DetailCard title="Types" className="mb-8">
+        <div className="flex flex-wrap gap-3">
+          <div className="h-10 bg-zinc-200 dark:bg-zinc-700 rounded-lg w-24 animate-pulse"></div>
+          <div className="h-10 bg-zinc-200 dark:bg-zinc-700 rounded-lg w-24 animate-pulse"></div>
+        </div>
+      </DetailCard>
+
+      {/* Abilities */}
+      <DetailCard title="Abilities" className="mb-8">
+        <div className="space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-14 bg-zinc-200 dark:bg-zinc-700 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      </DetailCard>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         {/* Sprites */}
         <DetailCard title="Sprites">
@@ -30,14 +47,18 @@ export default function PokemonDetailLoading() {
       </div>
 
       {/* Locations */}
-      <DetailCard title="Locations" className="mb-8">
-        <div className="h-32 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse"></div>
+      <DetailCard className="mb-8">
+        <div className="h-8 bg-zinc-200 dark:bg-zinc-700 rounded w-32 mb-4 animate-pulse" />
+        <SearchBarSkeleton />
+        <ListSkeleton count={8} />
       </DetailCard>
 
       {/* Moves */}
-      <DetailCard title="Moves">
-        <div className="h-32 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse"></div>
+      <DetailCard>
+        <div className="h-8 bg-zinc-200 dark:bg-zinc-700 rounded w-32 mb-4 animate-pulse" />
+        <SearchBarSkeleton />
+        <ListSkeleton count={8} />
       </DetailCard>
-    </div>
+    </DetailPageLayout>
   );
 }

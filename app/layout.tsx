@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Pokedex",
   description: "Pokemon Pokedex Application",
+  icons: {
+    icon: "/pokeball.svg",
+  },
 };
 
 export default function RootLayout({

@@ -1,6 +1,15 @@
 import { API_ENDPOINTS } from "./constants";
 
 // ============================================================================
+// Color Constants
+// ============================================================================
+
+/**
+ * Default/fallback color gradient for items without a specific color
+ */
+export const DEFAULT_COLOR = "from-gray-400 to-gray-500";
+
+// ============================================================================
 // Type Colors (Base)
 // ============================================================================
 
@@ -8,7 +17,7 @@ import { API_ENDPOINTS } from "./constants";
  * Pokemon/Move type color mappings
  */
 export const moveTypeColors: Record<string, string> = {
-  normal: "from-gray-400 to-gray-500",
+  normal: DEFAULT_COLOR,
   fire: "from-red-500 to-red-600",
   water: "from-blue-500 to-blue-600",
   electric: "from-yellow-400 to-yellow-500",
@@ -32,7 +41,7 @@ export const moveTypeColors: Record<string, string> = {
  * Get color for a move/Pokemon type
  */
 export function getMoveTypeColor(typeName: string): string {
-  return moveTypeColors[typeName.toLowerCase()] || "from-gray-400 to-gray-500";
+  return moveTypeColors[typeName.toLowerCase()] || DEFAULT_COLOR;
 }
 
 // ============================================================================
@@ -53,13 +62,13 @@ function extractColorFromGradient(gradient: string, part: "from" | "to"): string
  */
 export function getPokemonColor(types: Array<{ type: { name: string } }>): string {
   if (!types || !Array.isArray(types) || types.length === 0) {
-    return "from-gray-400 to-gray-500";
+    return DEFAULT_COLOR;
   }
   
   // Get first type
   const firstType = types[0];
   if (!firstType || !firstType.type || !firstType.type.name) {
-    return "from-gray-400 to-gray-500";
+    return DEFAULT_COLOR;
   }
   
   const primaryType = firstType.type.name;
@@ -67,13 +76,13 @@ export function getPokemonColor(types: Array<{ type: { name: string } }>): strin
   
   // If single type, return its color
   if (types.length === 1) {
-    return primaryColor || "from-gray-400 to-gray-500";
+    return primaryColor || DEFAULT_COLOR;
   }
   
   // For dual-type, blend the colors
   const secondType = types[1];
   if (!secondType || !secondType.type || !secondType.type.name) {
-    return primaryColor || "from-gray-400 to-gray-500";
+    return primaryColor || DEFAULT_COLOR;
   }
   
   const secondaryType = secondType.type.name;
@@ -88,7 +97,7 @@ export function getPokemonColor(types: Array<{ type: { name: string } }>): strin
   }
   
   // Fallback if extraction fails
-  return primaryColor || "from-gray-400 to-gray-500";
+  return primaryColor || DEFAULT_COLOR;
 }
 
 // ============================================================================
@@ -100,7 +109,7 @@ export function getPokemonColor(types: Array<{ type: { name: string } }>): strin
  */
 export function getRegionColor(regionName: string | null | undefined): string {
   if (!regionName) {
-    return "from-gray-400 to-gray-500";
+    return DEFAULT_COLOR;
   }
   
   const regionColors: Record<string, string> = {
@@ -132,7 +141,7 @@ export function getRegionColor(regionName: string | null | undefined): string {
     "paldea": "from-red-600 to-violet-600",
   };
   
-  return regionColors[regionName.toLowerCase()] || "from-gray-400 to-gray-500";
+  return regionColors[regionName.toLowerCase()] || DEFAULT_COLOR;
 }
 
 /**
@@ -169,7 +178,7 @@ export async function getPokemonItemColor(name: string): Promise<string> {
   try {
     const response = await fetch(`${API_ENDPOINTS.POKEMON}/${name}`);
     if (!response.ok) {
-      return "from-gray-400 to-gray-500";
+      return DEFAULT_COLOR;
     }
     
     const pokemon = await response.json();
@@ -181,9 +190,9 @@ export async function getPokemonItemColor(name: string): Promise<string> {
         return getPokemonColor(pokemon.types);
       }
     }
-    return "from-gray-400 to-gray-500";
+    return DEFAULT_COLOR;
   } catch {
-    return "from-gray-400 to-gray-500";
+    return DEFAULT_COLOR;
   }
 }
 
@@ -194,9 +203,9 @@ export async function getMoveItemColor(name: string): Promise<string> {
     if (move.type) {
       return getMoveTypeColor(move.type.name);
     }
-    return "from-gray-400 to-gray-500";
+    return DEFAULT_COLOR;
   } catch {
-    return "from-gray-400 to-gray-500";
+    return DEFAULT_COLOR;
   }
 }
 
@@ -204,7 +213,7 @@ export async function getLocationItemColor(name: string): Promise<string> {
   try {
     const response = await fetch(`${API_ENDPOINTS.LOCATION}/${name}`);
     if (!response.ok) {
-      return "from-gray-400 to-gray-500";
+      return DEFAULT_COLOR;
     }
     
     const location = await response.json();
@@ -213,9 +222,9 @@ export async function getLocationItemColor(name: string): Promise<string> {
     if (location.region && location.region.name) {
       return getRegionColor(location.region.name);
     }
-    return "from-gray-400 to-gray-500";
+    return DEFAULT_COLOR;
   } catch {
-    return "from-gray-400 to-gray-500";
+    return DEFAULT_COLOR;
   }
 }
 

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { formatName, formatGenerationName } from "./format";
+import { formatName } from "./format";
 
 export function generateDetailMetadata(
   type: "pokemon" | "location" | "move" | "generation",
@@ -16,9 +16,8 @@ export function generateDetailMetadata(
     };
   }
 
-  // Detail page - format the name
-  const formattedName =
-    type === "generation" ? formatGenerationName(name) : formatName(name);
+  // Detail page - format the name (formatName handles generation names automatically)
+  const formattedName = formatName(name);
 
   return {
     title: `Pokedex – ${formattedName}`,

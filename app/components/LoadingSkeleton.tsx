@@ -65,3 +65,23 @@ export function DetailCardSkeleton() {
     </div>
   );
 }
+
+interface ListPageLoadingProps {
+  title: string;
+  skeletonCount?: number;
+}
+
+export function ListPageLoading({ 
+  title, 
+  skeletonCount = 12 
+}: ListPageLoadingProps) {
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <h1 className="text-3xl font-bold mb-6 capitalize text-black dark:text-zinc-50">
+        {title}
+      </h1>
+      <SearchBarSkeleton />
+      <ListSkeleton count={skeletonCount} />
+    </div>
+  );
+}

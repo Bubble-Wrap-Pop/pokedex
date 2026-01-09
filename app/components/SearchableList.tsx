@@ -1,20 +1,19 @@
 "use client";
 
-import { useState, useEffect, useMemo, useDeferredValue, useCallback } from "react";
+import { useState, useEffect, useMemo, useDeferredValue } from "react";
 import Link from "next/link";
-import { formatName, formatGenerationName } from "../lib/format";
+import { formatName } from "../lib/format";
 import { UI_CONFIG } from "../lib/constants";
 import ColoredListItem from "./ColoredListItem";
-import { useItemColor } from "../lib/colors.client";
-
-type ListItem = { name: string };
+import { useItemColor, useBatchItemColors } from "../lib/colors.client";
+import { DEFAULT_COLOR } from "../lib/colors";
+import type { SearchableListItem } from "../lib/types";
 
 interface SearchableListProps {
   title: string;
-  items: Array<ListItem>;
+  items: Array<SearchableListItem>;
   hrefPattern: string;
   titleSize?: "large" | "medium";
-  formatType?: "default" | "generation";
   itemsPerPage?: number;
   colorType?: string;
 }
@@ -24,14 +23,11 @@ export default function SearchableList({
   items,
   hrefPattern,
   titleSize = "large",
-  formatType = "default",
   itemsPerPage = UI_CONFIG.ITEMS_PER_PAGE,
   colorType = "none",
 }: SearchableListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(itemsPerPage);
-  const [colorMap, setColorMap] = useState<Record<string, string>>({});
-  const [isLoadingColors, setIsLoadingColors] = useState(false);
 
   // Get the appropriate color function - logic is in a separate hook
   const getItemColor = useItemColor(colorType);
@@ -44,23 +40,13 @@ export default function SearchableList({
     setVisibleCount(itemsPerPage);
   }, [searchQuery, itemsPerPage]);
 
-  const formatItemName = useCallback(
-    (name: string) => {
-      if (formatType === "generation") {
-        return formatGenerationName(name);
-      }
-      return formatName(name);
-    },
-    [formatType]
-  );
-
   // Memoize filtered items for better performance
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
-      const formattedName = formatItemName(item.name);
+      const formattedName = formatName(item.name);
       return formattedName.toLowerCase().includes(deferredSearchQuery.toLowerCase());
     });
-  }, [items, deferredSearchQuery, formatItemName]);
+  }, [items, deferredSearchQuery]);
 
   // Show-more calculations
   const totalFiltered = filteredItems.length;
@@ -68,57 +54,7 @@ export default function SearchableList({
   const paginatedItems = filteredItems.slice(0, displayedEnd);
 
   // Batch fetch colors for visible items
-  useEffect(() => {
-    if (!getItemColor || paginatedItems.length === 0) {
-      return;
-    }
-
-    // Only fetch colors for items we don't already have
-    const itemsToFetch = paginatedItems.filter((item) => !colorMap[item.name]);
-    
-    if (itemsToFetch.length === 0) {
-      setIsLoadingColors(false);
-      return;
-    }
-
-    let cancelled = false;
-    setIsLoadingColors(true);
-
-    const fetchColors = async () => {
-      try {
-        // Fetch all colors in parallel
-        const colorPromises = itemsToFetch.map(async (item) => {
-          try {
-            const color = await getItemColor(item.name);
-            return { name: item.name, color };
-          } catch {
-            return { name: item.name, color: "from-gray-400 to-gray-500" };
-          }
-        });
-
-        const results = await Promise.all(colorPromises);
-        
-        if (!cancelled) {
-          const newColorMap: Record<string, string> = {};
-          results.forEach(({ name, color }) => {
-            newColorMap[name] = color;
-          });
-          setColorMap((prev) => ({ ...prev, ...newColorMap }));
-          setIsLoadingColors(false);
-        }
-      } catch {
-        if (!cancelled) {
-          setIsLoadingColors(false);
-        }
-      }
-    };
-
-    fetchColors();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [paginatedItems, getItemColor, colorMap]);
+  const { colorMap, isLoadingColors } = useBatchItemColors(paginatedItems, getItemColor);
 
   const titleClassName =
     titleSize === "large"
@@ -173,7 +109,7 @@ export default function SearchableList({
             aria-label={`${title} search results`}
           >
             {paginatedItems.map((item) => {
-              const formattedName = formatItemName(item.name);
+              const formattedName = formatName(item.name);
               const href = hrefPattern.replace("{name}", item.name);
 
               // Use ColoredListItem if getItemColor is provided
@@ -184,7 +120,7 @@ export default function SearchableList({
                     name={item.name}
                     href={href}
                     formattedName={formattedName}
-                    colorClass={colorMap[item.name] || "from-gray-400 to-gray-500"}
+                    colorClass={colorMap[item.name] || DEFAULT_COLOR}
                     isLoading={!colorMap[item.name] && isLoadingColors}
                   />
                 );

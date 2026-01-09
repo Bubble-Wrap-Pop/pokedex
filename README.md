@@ -27,11 +27,12 @@ A comprehensive Pokemon Pokedex application built with Next.js, TypeScript, and 
   - Main region information
   - Complete list of Pokemon species in each generation
 
-- **Search Functionality**: Client-side search across all major lists
+- **Color-Coded Lists**: Dynamic color gradients based on Pokemon types, move types, regions, and generations with intelligent batching and caching
+- **Search Functionality**: Client-side search across all major lists with pagination, result counts, and deferred value updates for smooth performance
 - **Responsive Design**: Fully optimized for mobile and desktop screens
-- **Dark Mode**: Automatic dark mode support
+- **Dark Mode**: Automatic dark mode support with smooth transitions
 - **Loading States**: Smooth loading skeletons for better UX
-- **Navigation**: Intuitive tab-based navigation with back button support
+- **Navigation**: Intuitive tab-based navigation with back button support and scroll restoration
 
 ## 🛠️ Technology Stack
 
@@ -76,6 +77,7 @@ A comprehensive Pokemon Pokedex application built with Next.js, TypeScript, and 
 
 4. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
+   (Note: The home page (`/`) automatically redirects to `/pokemon`)
 
 ## 📁 Project Structure
 
@@ -83,15 +85,18 @@ A comprehensive Pokemon Pokedex application built with Next.js, TypeScript, and 
 app/
 ├── components/          # Reusable React components
 │   ├── BackButton.tsx
+│   ├── ColoredListItem.tsx
 │   ├── DetailCard.tsx
 │   ├── DetailPageLayout.tsx
 │   ├── EmptyState.tsx
-│   ├── EmptyStateCard.tsx
+│   ├── HeaderImage.tsx
 │   ├── LoadingSkeleton.tsx
 │   ├── SearchableList.tsx
 │   └── TabsNavigation.tsx
 ├── lib/                # Utility functions and API logic
 │   ├── api.ts          # PokeAPI integration
+│   ├── colors.ts       # Color utilities for types and regions
+│   ├── colors.client.ts # Client-side color hooks
 │   ├── constants.ts    # Configuration constants
 │   ├── format.ts       # Text formatting utilities
 │   ├── metadata.ts     # SEO metadata generation
@@ -108,7 +113,8 @@ app/
 ├── generations/        # Generation pages
 │   ├── page.tsx        # Generation list
 │   └── [name]/         # Individual generation details
-└── layout.tsx          # Root layout with navigation
+├── layout.tsx          # Root layout with navigation
+└── template.tsx        # Template wrapper for scroll restoration
 ```
 
 ## 🎯 Key Features Implementation
@@ -123,9 +129,27 @@ app/
 - Graceful error handling with `notFound()` for missing resources
 
 ### Search Functionality
-- Client-side search with deferred value updates for smooth performance
-- Real-time filtering with pagination support
+- Client-side search with `useDeferredValue` for smooth performance
+- Real-time filtering with pagination support ("Show more" button)
+- Search result count display (e.g., "50 of 1000")
+- Sticky search bar on main list pages for better UX
 - Search works across all major list pages
+- Supports both colored and non-colored list items
+
+### Color System
+- Dynamic color gradients for list items based on Pokemon types, move types, regions, and generations
+- Dual-type Pokemon use blended colors for visual appeal
+- Server-side color determination for detail pages using already-fetched data
+- Client-side color fetching for list items with intelligent batching:
+  - Colors are only fetched for currently visible/paginated items (not all items at once)
+  - Batch fetching using `useBatchItemColors` hook with parallel API calls
+  - Built-in caching to avoid re-fetching colors for previously loaded items
+  - Loading states with opacity transitions while colors are being fetched
+  - Automatic cancellation to prevent race conditions when items change
+
+### Scroll Restoration
+- Automatic scroll-to-top on route changes using Next.js Template component
+- Improved navigation experience when navigating between pages
 
 ### Responsive Design
 - Mobile-first approach with Tailwind CSS

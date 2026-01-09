@@ -2,18 +2,17 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
-import EmptyStateCard from "../../components/EmptyStateCard";
+import EmptyState from "../../components/EmptyState";
 import SearchableList from "../../components/SearchableList";
 import { getPokemon, getPokemonLocations } from "../../lib/api";
 import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
 import { getMoveTypeColor, getPokemonColor } from "../../lib/colors";
+import type { DetailPageParams } from "../../lib/types";
 import type { Metadata } from "next";
 
-interface PokemonDetailPageProps {
-  params: Promise<{ name: string }>;
-}
+interface PokemonDetailPageProps extends DetailPageParams {}
 
 export async function generateMetadata({ params }: PokemonDetailPageProps): Promise<Metadata> {
   const { name } = await params;
@@ -207,7 +206,7 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
               colorType="location"
             />
           ) : (
-            <EmptyStateCard title="Locations" message="No locations found" />
+            <EmptyState title="Locations" message="No locations found" />
           )}
         </DetailCard>
 
@@ -223,7 +222,7 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
               colorType="move"
             />
           ) : (
-            <EmptyStateCard title="Moves" message="No moves found" />
+            <EmptyState title="Moves" message="No moves found" />
           )}
         </DetailCard>
       </DetailPageLayout>

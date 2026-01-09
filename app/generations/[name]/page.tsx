@@ -1,22 +1,21 @@
 import { notFound } from "next/navigation";
 import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
-import EmptyStateCard from "../../components/EmptyStateCard";
+import EmptyState from "../../components/EmptyState";
 import SearchableList from "../../components/SearchableList";
 import { getGeneration } from "../../lib/api";
-import { formatGenerationName, formatName } from "../../lib/format";
+import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
 import { getGenerationColor } from "../../lib/colors";
 import type { Metadata } from "next";
+import type { DetailPageParams } from "../../lib/types";
 
-interface GenerationDetailPageProps {
-  params: Promise<{ name: string }>;
-}
+interface GenerationDetailPageProps extends DetailPageParams {}
 
 export async function generateMetadata({ params }: GenerationDetailPageProps): Promise<Metadata> {
   const { name } = await params;
-  const formattedName = formatGenerationName(name);
+  const formattedName = formatName(name);
   return generateDetailMetadata("generation", `${formattedName} details and Pokémon species.`, name);
 }
 
@@ -25,7 +24,7 @@ export default async function GenerationDetailPage({ params }: GenerationDetailP
 
   try {
     const generation = await getGeneration(generationName);
-    const formattedName = formatGenerationName(generation.name);
+    const formattedName = formatName(generation.name);
     const subtitle = generation.main_region
       ? `Main Region: ${formatName(generation.main_region.name)}`
       : undefined;
@@ -47,7 +46,7 @@ export default async function GenerationDetailPage({ params }: GenerationDetailP
               colorType="pokemon"
             />
           ) : (
-            <EmptyStateCard title="Pokemon Species" message="No Pokemon species found" />
+            <EmptyState title="Pokemon Species" message="No Pokemon species found" />
           )}
         </DetailCard>
       </DetailPageLayout>

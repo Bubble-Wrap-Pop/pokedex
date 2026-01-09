@@ -3,17 +3,15 @@ import type { Metadata } from "next";
 import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
 import EmptyState from "../../components/EmptyState";
-import EmptyStateCard from "../../components/EmptyStateCard";
 import SearchableList from "../../components/SearchableList";
 import { getLocation, getLocationAreas } from "../../lib/api";
 import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
 import { getRegionColor } from "../../lib/colors";
+import type { DetailPageParams } from "../../lib/types";
 
-interface LocationDetailPageProps {
-  params: Promise<{ name: string }>;
-}
+interface LocationDetailPageProps extends DetailPageParams {}
 
 export async function generateMetadata({ params }: LocationDetailPageProps): Promise<Metadata> {
   const { name } = await params;
@@ -60,7 +58,7 @@ export default async function LocationDetailPage({ params }: LocationDetailPageP
                     colorType="pokemon"
                   />
                 ) : (
-                  <EmptyStateCard title={areaName} message="No Pokemon found in this area" />
+                  <EmptyState title={areaName} message="No Pokemon found in this area" />
                 )}
               </DetailCard>
             );

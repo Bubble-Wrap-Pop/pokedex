@@ -30,11 +30,6 @@ export interface PokemonData {
   }>;
 }
 
-export interface PokemonListItem {
-  name: string;
-  url: string;
-}
-
 // Location types
 export interface LocationData {
   name: string;
@@ -113,4 +108,12 @@ export interface LocationAreaData {
   location: {
     name: string;
   };
+}
+
+// Component types
+export type SearchableListItem = { name: string };
+
+// Next.js page props
+export interface DetailPageParams {
+  params: Promise<{ name: string }>;
 }

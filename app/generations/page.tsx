@@ -17,7 +17,6 @@ export default async function GenerationsPage() {
       items={generations}
       hrefPattern="/generations/{name}"
       itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE}
-      formatType="generation"
       colorType="generation"
     />
   );
