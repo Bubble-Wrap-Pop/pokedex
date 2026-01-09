@@ -14,8 +14,8 @@ export default function TabsNavigation() {
   ];
 
   return (
-    <nav className="border-b border-zinc-200 dark:border-zinc-800" aria-label="Main navigation">
-        <div className="flex space-x-8 px-4 sm:px-6 lg:px-8" role="tablist">
+    <nav className="sticky top-0 z-50 bg-zinc-50 dark:bg-black border-b border-zinc-200 dark:border-zinc-800" aria-label="Main navigation">
+      <div className="flex space-x-8 px-4 sm:px-6 lg:px-8" role="tablist">
           {tabs.map((tab) => {
             const isActive = pathname === tab.href || (pathname === "/" && tab.href === "/pokemon");
             return (

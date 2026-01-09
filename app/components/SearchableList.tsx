@@ -5,6 +5,7 @@ import Link from "next/link";
 import { formatName, formatGenerationName } from "../lib/format";
 import { UI_CONFIG } from "../lib/constants";
 import ColoredListItem from "./ColoredListItem";
+import { useItemColor } from "../lib/colors.client";
 
 type ListItem = { name: string };
 
@@ -15,7 +16,7 @@ interface SearchableListProps {
   titleSize?: "large" | "medium";
   formatType?: "default" | "generation";
   itemsPerPage?: number;
-  getItemColor?: (name: string) => Promise<string>;
+  colorType?: string;
 }
 
 export default function SearchableList({
@@ -25,12 +26,15 @@ export default function SearchableList({
   titleSize = "large",
   formatType = "default",
   itemsPerPage = UI_CONFIG.ITEMS_PER_PAGE,
-  getItemColor,
+  colorType = "none",
 }: SearchableListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(itemsPerPage);
   const [colorMap, setColorMap] = useState<Record<string, string>>({});
   const [isLoadingColors, setIsLoadingColors] = useState(false);
+
+  // Get the appropriate color function - logic is in a separate hook
+  const getItemColor = useItemColor(colorType);
 
   // Defer search query for better performance
   const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -133,7 +137,9 @@ export default function SearchableList({
         <h2 className={titleClassName}>{title}</h2>
       )}
 
-      <div className="mb-4 flex items-center justify-between gap-2">
+      <div className={`mb-4 flex items-center justify-between gap-2 ${
+        titleSize === "large" ? "sticky top-[54px] z-40 bg-zinc-50 dark:bg-black py-3 -mx-4 px-4 -mt-6 border-b border-zinc-200 dark:border-zinc-800" : ""
+      }`}>
         <label htmlFor={`search-${title.toLowerCase().replace(/\s+/g, "-")}`} className="sr-only">
           Search {title}
         </label>

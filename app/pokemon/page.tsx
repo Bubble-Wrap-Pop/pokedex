@@ -1,7 +1,7 @@
 import { getPokemonList } from "../lib/api";
 import { UI_CONFIG } from "../lib/constants";
 import { generateDetailMetadata } from "../lib/metadata";
-import PokemonList from "../components/PokemonList";
+import SearchableList from "../components/SearchableList";
 
 export const metadata = generateDetailMetadata(
   "pokemon",
@@ -12,11 +12,12 @@ export default async function PokemonPage() {
   const pokemon = await getPokemonList();
 
   return (
-    <PokemonList
+    <SearchableList
       title="Pokemon"
       items={pokemon}
       hrefPattern="/pokemon/{name}"
       itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE}
+      colorType="pokemon"
     />
   );
 }

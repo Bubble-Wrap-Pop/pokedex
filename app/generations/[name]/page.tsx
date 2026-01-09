@@ -2,12 +2,12 @@ import { notFound } from "next/navigation";
 import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
 import EmptyStateCard from "../../components/EmptyStateCard";
-import PokemonList from "../../components/PokemonList";
+import SearchableList from "../../components/SearchableList";
 import { getGeneration } from "../../lib/api";
 import { formatGenerationName, formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
-import { getGenerationColor } from "../../lib/regionColors";
+import { getGenerationColor } from "../../lib/colors";
 import type { Metadata } from "next";
 
 interface GenerationDetailPageProps {
@@ -32,14 +32,11 @@ export default async function GenerationDetailPage({ params }: GenerationDetailP
     const generationColor = getGenerationColor(generation.name);
 
     return (
-      <>
-        {/* Colored header accent */}
-        <div className={`h-2 bg-gradient-to-r ${generationColor} w-full`} />
-        <DetailPageLayout title={formattedName} subtitle={subtitle}>
+      <DetailPageLayout title={formattedName} subtitle={subtitle} accentColor={generationColor}>
         {/* Pokemon Species */}
         <DetailCard>
           {generation.pokemon_species && generation.pokemon_species.length > 0 ? (
-            <PokemonList
+            <SearchableList
               title="Pokemon Species"
               items={generation.pokemon_species.map((species) => ({
                 name: species.name,
@@ -47,13 +44,13 @@ export default async function GenerationDetailPage({ params }: GenerationDetailP
               hrefPattern="/pokemon/{name}"
               titleSize="medium"
               itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE_DETAIL}
+              colorType="pokemon"
             />
           ) : (
             <EmptyStateCard title="Pokemon Species" message="No Pokemon species found" />
           )}
         </DetailCard>
       </DetailPageLayout>
-      </>
     );
   } catch {
     notFound();

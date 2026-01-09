@@ -4,12 +4,12 @@ import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
 import EmptyState from "../../components/EmptyState";
 import EmptyStateCard from "../../components/EmptyStateCard";
-import PokemonList from "../../components/PokemonList";
+import SearchableList from "../../components/SearchableList";
 import { getLocation, getLocationAreas } from "../../lib/api";
 import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
-import { getRegionColor } from "../../lib/regionColors";
+import { getRegionColor } from "../../lib/colors";
 
 interface LocationDetailPageProps {
   params: Promise<{ name: string }>;
@@ -40,10 +40,7 @@ export default async function LocationDetailPage({ params }: LocationDetailPageP
     const regionColor = getRegionColor(location.region?.name);
 
     return (
-      <>
-        {/* Colored header accent */}
-        <div className={`h-2 bg-gradient-to-r ${regionColor} w-full`} />
-        <DetailPageLayout title={formattedName} subtitle={subtitle}>
+      <DetailPageLayout title={formattedName} subtitle={subtitle} accentColor={regionColor}>
         <div className="space-y-6">
           {locationAreas.map((area) => {
             const areaName = formatName(area.name);
@@ -52,7 +49,7 @@ export default async function LocationDetailPage({ params }: LocationDetailPageP
             return (
               <DetailCard key={area.name}>
                 {pokemon.length > 0 ? (
-                  <PokemonList
+                  <SearchableList
                     title={areaName}
                     items={pokemon.map((encounter) => ({
                       name: encounter.pokemon.name,
@@ -60,6 +57,7 @@ export default async function LocationDetailPage({ params }: LocationDetailPageP
                     hrefPattern="/pokemon/{name}"
                     titleSize="medium"
                     itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE_DETAIL}
+                    colorType="pokemon"
                   />
                 ) : (
                   <EmptyStateCard title={areaName} message="No Pokemon found in this area" />
@@ -75,7 +73,6 @@ export default async function LocationDetailPage({ params }: LocationDetailPageP
           </DetailCard>
         )}
       </DetailPageLayout>
-      </>
     );
   } catch {
     notFound();

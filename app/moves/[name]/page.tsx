@@ -5,12 +5,12 @@ import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
 import EmptyState from "../../components/EmptyState";
 import EmptyStateCard from "../../components/EmptyStateCard";
-import PokemonList from "../../components/PokemonList";
+import SearchableList from "../../components/SearchableList";
 import { getMove } from "../../lib/api";
 import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
-import { getMoveTypeColor } from "../../lib/moveColors";
+import { getMoveTypeColor } from "../../lib/colors";
 
 interface MoveDetailPageProps {
   params: Promise<{ name: string }>;
@@ -49,10 +49,7 @@ export default async function MoveDetailPage({ params }: MoveDetailPageProps) {
       : null;
 
     return (
-      <>
-        {/* Colored header accent */}
-        <div className={`h-2 bg-gradient-to-r ${moveTypeColor} w-full`} />
-        <DetailPageLayout title={formattedName}>
+      <DetailPageLayout title={formattedName} accentColor={moveTypeColor}>
         {/* Move Type and Damage Class */}
         <DetailCard title="Type & Category" className="mb-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -132,12 +129,13 @@ export default async function MoveDetailPage({ params }: MoveDetailPageProps) {
         {/* Pokemon that can learn this move */}
         <DetailCard>
           {move.learned_by_pokemon && move.learned_by_pokemon.length > 0 ? (
-            <PokemonList
+            <SearchableList
               title="Pokemon that can learn this move"
               items={move.learned_by_pokemon.map((p) => ({ name: p.name }))}
               hrefPattern="/pokemon/{name}"
               titleSize="medium"
               itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE_DETAIL}
+              colorType="pokemon"
             />
           ) : (
             <EmptyStateCard
@@ -147,7 +145,6 @@ export default async function MoveDetailPage({ params }: MoveDetailPageProps) {
           )}
         </DetailCard>
       </DetailPageLayout>
-      </>
     );
   } catch {
     notFound();

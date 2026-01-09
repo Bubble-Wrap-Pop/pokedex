@@ -3,14 +3,12 @@ import Image from "next/image";
 import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
 import EmptyStateCard from "../../components/EmptyStateCard";
-import LocationList from "../../components/LocationList";
-import MovesList from "../../components/MovesList";
+import SearchableList from "../../components/SearchableList";
 import { getPokemon, getPokemonLocations } from "../../lib/api";
 import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
-import { getMoveTypeColor } from "../../lib/moveColors";
-import { getPokemonColor } from "../../lib/pokemonColors";
+import { getMoveTypeColor, getPokemonColor } from "../../lib/colors";
 import type { Metadata } from "next";
 
 interface PokemonDetailPageProps {
@@ -37,10 +35,7 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
     const pokemonColor = getPokemonColor(pokemon.types);
 
     return (
-      <>
-        {/* Colored header accent */}
-        <div className={`h-2 bg-gradient-to-r ${pokemonColor} w-full`} />
-        <DetailPageLayout title={formattedName}>
+      <DetailPageLayout title={formattedName} accentColor={pokemonColor}>
         {/* Types */}
         <DetailCard title="Types" className="mb-8">
           <div className="flex flex-wrap gap-3">
@@ -203,12 +198,13 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
         {/* Locations */}
         <DetailCard className="mb-8">
           {locations.length > 0 ? (
-            <LocationList
+            <SearchableList
               title="Locations"
               items={locations.map((name) => ({ name }))}
               hrefPattern="/locations/{name}"
               titleSize="medium"
               itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE_DETAIL}
+              colorType="location"
             />
           ) : (
             <EmptyStateCard title="Locations" message="No locations found" />
@@ -218,19 +214,19 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
         {/* Moves */}
         <DetailCard>
           {pokemon.moves.length > 0 ? (
-            <MovesList
+            <SearchableList
               title="Moves"
               items={pokemon.moves.map((move) => ({ name: move.move.name }))}
               hrefPattern="/moves/{name}"
               titleSize="medium"
               itemsPerPage={UI_CONFIG.ITEMS_PER_PAGE_DETAIL}
+              colorType="move"
             />
           ) : (
             <EmptyStateCard title="Moves" message="No moves found" />
           )}
         </DetailCard>
       </DetailPageLayout>
-      </>
     );
   } catch {
     notFound();
