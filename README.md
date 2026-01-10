@@ -11,6 +11,7 @@ A comprehensive Pokemon Pokedex application built with Next.js, TypeScript, and 
 - **Pokemon Browser**: Searchable list of all Pokemon with detailed information including:
   - Stats with visual progress bars
   - Normal and shiny sprites
+  - Evolution chains (supports branching evolutions like Eevee)
   - Encounter locations
   - Moves learned
   
@@ -89,6 +90,7 @@ app/
 │   ├── DetailCard.tsx
 │   ├── DetailPageLayout.tsx
 │   ├── EmptyState.tsx
+│   ├── EvolutionChain.tsx
 │   ├── HeaderImage.tsx
 │   ├── LoadingSkeleton.tsx
 │   ├── SearchableList.tsx
@@ -150,6 +152,14 @@ app/
 ### Scroll Restoration
 - Automatic scroll-to-top on route changes using Next.js Template component
 - Improved navigation experience when navigating between pages
+
+### Evolution Chain Display
+- Visual evolution chain display with Pokemon sprites
+- Supports both linear and branching evolution chains (e.g., Eevee's multiple evolutions)
+- Shows evolution requirements (level, item) when available
+- Highlights the current Pokemon in the chain
+- Clickable links to navigate between evolution stages
+- Server-side rendered for optimal performance
 
 ### Responsive Design
 - Mobile-first approach with Tailwind CSS

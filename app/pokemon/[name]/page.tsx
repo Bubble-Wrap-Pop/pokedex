@@ -24,7 +24,7 @@ interface PokemonDetailPageProps extends DetailPageParams {}
 export async function generateMetadata({ params }: PokemonDetailPageProps): Promise<Metadata> {
   const { name } = await params;
   const formattedName = formatName(name);
-  return generateDetailMetadata("pokemon", `${formattedName} details, abilities, stats, moves, and encounter locations.`, name);
+  return generateDetailMetadata("pokemon", `${formattedName} details, abilities, stats, evolution chain, moves, and encounter locations.`, name);
 }
 
 export default async function PokemonDetailPage({ params }: PokemonDetailPageProps) {
