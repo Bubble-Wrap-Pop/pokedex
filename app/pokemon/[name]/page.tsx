@@ -16,7 +16,7 @@ import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
 import { getMoveTypeColor, getPokemonColor } from "../../lib/colors";
-import type { DetailPageParams } from "../../lib/types";
+import type { DetailPageParams, ParsedEvolutionNode } from "../../lib/types";
 import type { Metadata } from "next";
 
 interface PokemonDetailPageProps extends DetailPageParams {}
@@ -53,31 +53,26 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
     if (species?.evolution_chain?.url) {
       try {
         const chainData = await getEvolutionChain(species.evolution_chain.url);
-        const parsedEvolutions = parseEvolutionChain(chainData.chain);
+        const parsedChain = parseEvolutionChain(chainData.chain);
         
-        // Fetch sprites for each Pokemon in the evolution chain
-        const evolutionPromises = parsedEvolutions.map(async (evo) => {
+        // Recursively fetch sprites for all Pokemon in the evolution chain
+        async function fetchSpritesForNode(node: ParsedEvolutionNode): Promise<ParsedEvolutionNode> {
           try {
-            const evoPokemon = await getPokemon(evo.name);
-            return {
-              name: evo.name,
-              sprite: evoPokemon.sprites.front_default,
-              minLevel: evo.minLevel,
-              trigger: evo.trigger,
-              item: evo.item,
-            };
+            const evoPokemon = await getPokemon(node.name);
+            node.sprite = evoPokemon.sprites.front_default;
           } catch {
-            return {
-              name: evo.name,
-              sprite: null,
-              minLevel: evo.minLevel,
-              trigger: evo.trigger,
-              item: evo.item,
-            };
+            node.sprite = null;
           }
-        });
+          
+          // Recursively fetch sprites for all branches
+          if (node.evolvesTo && node.evolvesTo.length > 0) {
+            await Promise.all(node.evolvesTo.map(fetchSpritesForNode));
+          }
+          
+          return node;
+        }
         
-        evolutionChainData = await Promise.all(evolutionPromises);
+        evolutionChainData = await fetchSpritesForNode(parsedChain);
       } catch {
         // Evolution chain fetch failed, continue without it
         evolutionChainData = null;
@@ -249,10 +244,10 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
         </div>
 
         {/* Evolution Chain */}
-        {evolutionChainData && evolutionChainData.length > 1 && (
+        {evolutionChainData && (
           <DetailCard title="Evolution Chain" className="mb-8">
             <EvolutionChain
-              evolutions={evolutionChainData}
+              evolutionChain={evolutionChainData}
               currentPokemonName={pokemon.name}
             />
           </DetailCard>

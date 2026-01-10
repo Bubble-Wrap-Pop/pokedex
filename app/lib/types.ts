@@ -62,6 +62,16 @@ export interface EvolutionChainLink {
   }>;
 }
 
+// Parsed evolution node structure for display
+export interface ParsedEvolutionNode {
+  name: string;
+  sprite: string | null;
+  minLevel: number | null;
+  trigger: string;
+  item: string | null;
+  evolvesTo: ParsedEvolutionNode[];
+}
+
 // Location types
 export interface LocationData {
   name: string;
