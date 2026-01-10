@@ -1,6 +1,10 @@
 // Pokemon types
 export interface PokemonData {
   name: string;
+  species: {
+    name: string;
+    url: string;
+  };
   types: Array<{
     type: {
       name: string;
@@ -27,6 +31,34 @@ export interface PokemonData {
       name: string;
       url: string;
     };
+  }>;
+}
+
+export interface PokemonSpeciesData {
+  name: string;
+  evolution_chain: {
+    url: string;
+  };
+}
+
+export interface EvolutionChainData {
+  chain: EvolutionChainLink;
+}
+
+export interface EvolutionChainLink {
+  species: {
+    name: string;
+    url: string;
+  };
+  evolves_to: EvolutionChainLink[];
+  evolution_details?: Array<{
+    min_level: number | null;
+    trigger: {
+      name: string;
+    };
+    item: {
+      name: string;
+    } | null;
   }>;
 }
 

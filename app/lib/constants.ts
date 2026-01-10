@@ -8,9 +8,11 @@ export const API_CONFIG = {
 
 export const API_ENDPOINTS = {
   POKEMON: `${POKEAPI_BASE_URL}/pokemon`,
+  POKEMON_SPECIES: `${POKEAPI_BASE_URL}/pokemon-species`,
   LOCATION: `${POKEAPI_BASE_URL}/location`,
   MOVE: `${POKEAPI_BASE_URL}/move`,
   GENERATION: `${POKEAPI_BASE_URL}/generation`,
+  EVOLUTION_CHAIN: `${POKEAPI_BASE_URL}/evolution-chain`,
 } as const;
 
 export const UI_CONFIG = {

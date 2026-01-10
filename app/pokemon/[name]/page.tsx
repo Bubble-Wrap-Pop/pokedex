@@ -4,7 +4,14 @@ import DetailPageLayout from "../../components/DetailPageLayout";
 import DetailCard from "../../components/DetailCard";
 import EmptyState from "../../components/EmptyState";
 import SearchableList from "../../components/SearchableList";
-import { getPokemon, getPokemonLocations } from "../../lib/api";
+import EvolutionChain from "../../components/EvolutionChain";
+import {
+  getPokemon,
+  getPokemonLocations,
+  getPokemonSpecies,
+  getEvolutionChain,
+  parseEvolutionChain,
+} from "../../lib/api";
 import { formatName } from "../../lib/format";
 import { UI_CONFIG } from "../../lib/constants";
 import { generateDetailMetadata } from "../../lib/metadata";
@@ -29,6 +36,53 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
       getPokemon(pokemonName),
       getPokemonLocations(pokemonName).catch(() => [] as string[]),
     ]);
+
+    // Fetch species data using the species name from pokemon data
+    let species = null;
+    if (pokemon.species?.name) {
+      try {
+        species = await getPokemonSpecies(pokemon.species.name);
+      } catch {
+        // Species fetch failed, continue without evolution chain
+        species = null;
+      }
+    }
+
+    // Fetch evolution chain if species data is available
+    let evolutionChainData = null;
+    if (species?.evolution_chain?.url) {
+      try {
+        const chainData = await getEvolutionChain(species.evolution_chain.url);
+        const parsedEvolutions = parseEvolutionChain(chainData.chain);
+        
+        // Fetch sprites for each Pokemon in the evolution chain
+        const evolutionPromises = parsedEvolutions.map(async (evo) => {
+          try {
+            const evoPokemon = await getPokemon(evo.name);
+            return {
+              name: evo.name,
+              sprite: evoPokemon.sprites.front_default,
+              minLevel: evo.minLevel,
+              trigger: evo.trigger,
+              item: evo.item,
+            };
+          } catch {
+            return {
+              name: evo.name,
+              sprite: null,
+              minLevel: evo.minLevel,
+              trigger: evo.trigger,
+              item: evo.item,
+            };
+          }
+        });
+        
+        evolutionChainData = await Promise.all(evolutionPromises);
+      } catch {
+        // Evolution chain fetch failed, continue without it
+        evolutionChainData = null;
+      }
+    }
 
     const formattedName = formatName(pokemon.name);
     const pokemonColor = getPokemonColor(pokemon.types);
@@ -193,6 +247,16 @@ export default async function PokemonDetailPage({ params }: PokemonDetailPagePro
             </div>
           </DetailCard>
         </div>
+
+        {/* Evolution Chain */}
+        {evolutionChainData && evolutionChainData.length > 1 && (
+          <DetailCard title="Evolution Chain" className="mb-8">
+            <EvolutionChain
+              evolutions={evolutionChainData}
+              currentPokemonName={pokemon.name}
+            />
+          </DetailCard>
+        )}
 
         {/* Locations */}
         <DetailCard className="mb-8">

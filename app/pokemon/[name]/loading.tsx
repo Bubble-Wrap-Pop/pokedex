@@ -46,6 +46,26 @@ export default function PokemonDetailLoading() {
         </DetailCard>
       </div>
 
+      {/* Evolution Chain */}
+      <DetailCard title="Evolution Chain" className="mb-8">
+        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-4 md:gap-6">
+              <div className="flex flex-col items-center gap-2 p-4 rounded-lg border-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                <div className="w-24 h-24 md:w-32 md:h-32 bg-zinc-200 dark:bg-zinc-700 rounded-lg animate-pulse"></div>
+                <div className="h-5 bg-zinc-200 dark:bg-zinc-700 rounded w-20 animate-pulse"></div>
+                <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-12 animate-pulse"></div>
+              </div>
+              {i < 2 && (
+                <div className="flex flex-col items-center text-zinc-400 dark:text-zinc-600">
+                  <div className="w-6 h-6 md:w-8 md:h-8 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse"></div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </DetailCard>
+
       {/* Locations */}
       <DetailCard className="mb-8">
         <div className="h-8 bg-zinc-200 dark:bg-zinc-700 rounded w-32 mb-4 animate-pulse" />

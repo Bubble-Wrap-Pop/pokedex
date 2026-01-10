@@ -1,6 +1,9 @@
 import { API_ENDPOINTS, API_CONFIG } from "./constants";
 import type {
   PokemonData,
+  PokemonSpeciesData,
+  EvolutionChainData,
+  EvolutionChainLink,
   LocationData,
   LocationArea,
   MoveData,
@@ -103,6 +106,49 @@ export async function getPokemonLocations(name: string): Promise<string[]> {
   });
 
   return Array.from(locationNames);
+}
+
+export async function getPokemonSpecies(name: string): Promise<PokemonSpeciesData> {
+  return fetchAPI<PokemonSpeciesData>(`${API_ENDPOINTS.POKEMON_SPECIES}/${name}`);
+}
+
+export async function getEvolutionChain(chainUrl: string): Promise<EvolutionChainData> {
+  return fetchAPI<EvolutionChainData>(chainUrl);
+}
+
+// Helper function to flatten evolution chain into a linear array
+// Note: This handles linear chains. For branching chains (like Eevee), 
+// it will take the first branch. This can be enhanced later if needed.
+export function parseEvolutionChain(chain: EvolutionChainLink): Array<{
+  name: string;
+  minLevel: number | null;
+  trigger: string;
+  item: string | null;
+}> {
+  const evolutions: Array<{
+    name: string;
+    minLevel: number | null;
+    trigger: string;
+    item: string | null;
+  }> = [];
+
+  function traverse(node: EvolutionChainLink) {
+    evolutions.push({
+      name: node.species.name,
+      minLevel: node.evolution_details?.[0]?.min_level ?? null,
+      trigger: node.evolution_details?.[0]?.trigger?.name ?? "level-up",
+      item: node.evolution_details?.[0]?.item?.name ?? null,
+    });
+
+    // For now, only handle linear chains (take first evolution)
+    // Branching evolution chains would require a more complex UI
+    if (node.evolves_to && node.evolves_to.length > 0) {
+      traverse(node.evolves_to[0]);
+    }
+  }
+
+  traverse(chain);
+  return evolutions;
 }
 
 // Location API functions
